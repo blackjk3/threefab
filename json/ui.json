@@ -1,0 +1,34 @@
+{
+  "preset": "Flow",
+  "remembered": {
+    "Default": {
+      "0": {
+        "message": "dat.gui",
+        "speed": 0.4,
+        "growthSpeed": 0.37,
+        "noiseStrength": 10,
+        "maxSize": 6.4
+      }
+    },
+    "Flow": {
+      "0": {
+        "message": "Doesn't really matter.",
+        "speed": 1.76,
+        "growthSpeed": 0.21,
+        "noiseStrength": 88,
+        "maxSize": 6.4
+      }
+    },
+    "Slow": {
+      "0": {
+        "message": "SLOW",
+        "speed": 0.12,
+        "growthSpeed": 0.08,
+        "noiseStrength": 13,
+        "maxSize": 10
+      }
+    }
+  },
+  "closed": false,
+  "folders": {}
+}
