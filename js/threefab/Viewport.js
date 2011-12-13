@@ -84,6 +84,7 @@ THREEFAB.Viewport = function( parameters ) {
 	
 	// Drag and drop functionality
 	$.subscribe('model/loaded', $.proxy(this.addModel, this));
+	$.subscribe('texture/loaded', $.proxy(this.addTexture, this));
 	$.subscribe('primitive/add', $.proxy(this.addPrimitive, this));
 	$.subscribe('light/add', $.proxy(this.addLight, this));
 	
@@ -92,6 +93,7 @@ THREEFAB.Viewport = function( parameters ) {
 	// =============================================================================
 	
 	this.setupDefaultScene.apply(this);
+	//this.addParticleSystem.apply(this);
 	
 	// =============================================================================
 	// Public Functions
@@ -121,6 +123,13 @@ THREEFAB.Viewport = function( parameters ) {
 	};
 	
 	this.selected = function(object) {
+		
+		// Remove the current overdraw
+		if(_this._SELECTED) {
+			_this._SELECTED.material.program = null;
+			_this._SELECTED.material.overdraw = false;
+		}
+		
 		_this._SELECTED = object;
 		
 		if(!_this._SELECTED.light) {
@@ -129,6 +138,8 @@ THREEFAB.Viewport = function( parameters ) {
 		} else {
 			// It's a light!
 			$.publish('viewport/light/selected', object);
+			_this._SELECTED.material.program = null;
+			_this._SELECTED.material.overdraw = true;
 		}
 	};
 	
@@ -287,9 +298,9 @@ THREEFAB.Viewport.prototype = {
 	addPrimitive: function(type) {
 		console.log(type);
 		console.log(this);
-		var material, geometry, mesh, meshName, rotation;
+		var material, geometry, mesh, meshName, rotation, doubleSided=false;
 		
-		material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false } );
+		material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.NoShading, overdraw:false } );
 		material.ambient = material.color;		
 				
 		if(type === "sphere") {
@@ -308,22 +319,68 @@ THREEFAB.Viewport.prototype = {
 			geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
 			meshName = 'THREE.PlaneGeometry';
 			rotation = new THREE.Vector3(-Math.PI/2,0,0);
+			doubleSided = true;
 		} else if(type === "torus") {	
 			geometry = new THREE.TorusGeometry();
 			rotation = new THREE.Vector3(-Math.PI/2,0,0);
 			meshName = 'THREE.TorusGeometry';
 		}
 		
+		geometry.dynamic = true;
 		mesh = new THREE.Mesh(geometry, material);
 		mesh.name = meshName + "." + mesh.id;
 		
 		if(rotation) {
 			mesh.rotation.copy(rotation);
 		}
+		if(doubleSided) {
+			mesh.doubleSided = true;
+		}
 		
 		this.scene.add(mesh);
 		
 		return mesh;
+	},
+	
+	addParticleSystem: function() {
+		// create the particle variables
+		var particleCount = 1800,
+		    particles = new THREE.Geometry(),
+		    pMaterial = new THREE.ParticleBasicMaterial({
+		        color: 0xFFFFFF,
+		        size: Math.random() * 25 + 10,
+		        map: THREE.ImageUtils.loadTexture(
+		            "img/particle.png"
+		        ),
+		        blending: THREE.AdditiveBlending,
+		        transparent: true
+		    });
+		
+		// now create the individual particles
+		for(var p = 0; p < particleCount; p++) {
+		
+		    // create a particle with random
+		    // position values, -250 -> 250
+		    var pX = Math.random() * 500 - 250,
+		        pY = Math.random() * 500 - 250,
+		        pZ = Math.random() * 500 - 250,
+		        particle = new THREE.Vertex(
+		            new THREE.Vector3(pX, pY, pZ)
+		        );
+		    
+		    // add it to the geometry
+		    particles.vertices.push(particle);
+		}
+		
+		// create the particle system
+		var particleSystem = new THREE.ParticleSystem(
+		    particles,
+		    pMaterial);
+		
+		particleSystem.sortParticles = true;
+		
+		// add it to the scene
+		this.scene.add(particleSystem);
 	},
 	
 	addModel:function(mesh) {
@@ -353,12 +410,71 @@ THREEFAB.Viewport.prototype = {
 		return lightmesh;
 	},
 	
+	addTexture:function(tex) {
+		console.log(tex);
+		//this._SELECTED.material.map = tex;
+		//this._SELECTED.material.program = false;
+			
+		//THREE.ImageUtils.loadTexture( "img/UV.jpg", THREE.UVMapping, function(img){
+		//	var texture = new THREE.Texture(img, THREE.UVMapping);
+		//	console.log(texture);
+			
+			/*var mat = new THREE.MeshPhongMaterial( { map: tex } );		
+			
+			var geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
+			var meshName = 'THREE.PlaneGeometry';
+			var rotation = new THREE.Vector3(-Math.PI/2,0,0);
+			
+			var mesh = new THREE.Mesh(geometry, mat);
+			mesh.name = meshName + "." + mesh.id;
+			
+			mesh.rotation.copy(rotation);
+			mesh.material.map.needsUpdate = true;
+			
+			this.scene.add(mesh);*/
+			
+			
+		//});
+		
+		this._SELECTED.material.program = null;
+		this._SELECTED.material.map = tex;
+		
+		/*this._SELECTED.material.program = null;
+		this._SELECTED.geometry.__dirtyVertices = true;
+		this._SELECTED.geometry.__dirtyNormals = true;*/
+		
+		//this._SELECTED.material = new THREE.MeshPhongMaterial( { map: tex } );		
+		
+		
+		
+		//var geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
+		//var mesh = new THREE.Mesh(geometry, material);
+		//mesh.rotation.copy(new THREE.Vector3(-Math.PI/2,0,0));
+		//mesh.material.map.needsUpdate = true;
+		//this.scene.add(mesh);
+		
+		//this._SELECTED.material.map = tex;
+		
+		
+		//var mat = this._SELECTED.material;
+		
+		//this._SELECTED.material.program = false;	
+		//this._SELECTED.material = new THREE.MeshBasicMaterial({ map: tex });
+		//this._SELECTED.material.map.needsUpdate = true;
+		
+		
+		//this.resetMaterials();
+	},
+	
 	resetMaterials: function() {
 		
 		for(var i=0, len = this.scene.children.length; i < len; i++) {
-			var child = this.scene.children[i];
+			var child = this.scene.children[i], cached_mat;
 			if(child.material && child instanceof THREE.Mesh) {
+				cached_mat = child.material;
 				child.material.program = false;
+				child.material = null;
+				child.material = cached_mat;
 			}
 		}
 		

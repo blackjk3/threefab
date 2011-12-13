@@ -77,6 +77,8 @@ THREEFAB.Ui = function(viewport) {
 	var folder_materials = _materials_gui.addFolder('Material');
 	var folder_light = _materials_gui.addFolder('Light');	
 	
+	var folder_textures = _materials_gui.addFolder('Textures');
+	
 	var materialList = [
 	 {
 	 	prop:'wireframe'
@@ -88,6 +90,10 @@ THREEFAB.Ui = function(viewport) {
 	 	prop:'opacity', 
 	 	min:0, 
 	 	max:1
+	 },
+	 {
+	 	prop:'shading', 
+	 	values:{None: 0, Flat: 1, Smooth: 2}
 	 },
 	 {
 	 	prop:'blending', 
@@ -164,7 +170,7 @@ THREEFAB.Ui = function(viewport) {
 		console.log(_viewport._SELECTED);
 		
 		folder.add(_viewport._SELECTED.material, 'name', {Basic: 'MeshBasicMaterial', Phong:'MeshPhongMaterial', Lambert: 'MeshLambertMaterial'}).onChange(function(matName){
-			resetMaterial(matName);
+			rebuildMaterial(matName);
 			//removeFolderControllers(folder_materials);
 			//addMaterials(folder_materials);
 		});
@@ -186,16 +192,17 @@ THREEFAB.Ui = function(viewport) {
 		});
 	}
 	
-	function resetMaterial(matName) {
-		console.log(matName);
+	function rebuildMaterial(matName) {
+		
 		var mat;
 	
 		// We can make a generic function constructor based on the material name.
 		mat = new THREE[matName]();
 		mat.name = matName;
 		copyMaterialAttributes(mat);
-		_viewport._SELECTED.material = mat;
 		_viewport._SELECTED.material.program = false;
+		_viewport._SELECTED.material = mat;
+		
 		console.log(_viewport._SELECTED);
 	}
 	
@@ -206,6 +213,11 @@ THREEFAB.Ui = function(viewport) {
 				mat[materialList[i].prop] = _viewport._SELECTED.material[materialList[i].prop];
 			}
 		}
+		
+		// Copy the map and color manually.
+		mat['map'] = _viewport._SELECTED.material['map'];
+		mat['color'] = _viewport._SELECTED.material['color'];
+		mat['ambient'] = _viewport._SELECTED.material['ambient'];
 		
 	}
 	
@@ -268,8 +280,9 @@ THREEFAB.Ui = function(viewport) {
 		}
 		
 		folder.add(_viewport._SELECTED, 'castShadow');
-		folder.add(_viewport._SELECTED, 'receiveShadow').onChange(function(){
-			_viewport.resetMaterials();
+		folder.add(_viewport._SELECTED, 'receiveShadow').onChange(function() {
+			// TODO: Find the actual shader.
+			_viewport.rebuildMaterial("MeshPhongMaterial");
 		});
 	}
 	
