@@ -7,24 +7,23 @@
 
 (function(){
 	
-	var dragDrop = new THREEFAB.DragDropLoader(),
-	    viewport = new THREEFAB.Viewport(),
-	    toolbox, ui;  		
-	
-	// App Resize
-	window.addEventListener('resize', function(event) { 
-		viewport.setSize( window.innerWidth, window.innerHeight );
-	}, false);
-	
-	
-	// Start animating viewport
-	viewport.animate();
-	
-	
 	// Ready
 	$(document).ready(function(){
-		ui = new THREEFAB.Ui(viewport);
+
+		var dragDrop = new THREEFAB.DragDropLoader(),
+	    viewport = new THREEFAB.Viewport(),
+	    ui = new THREEFAB.Ui(viewport),
 		toolbox = new THREEFAB.Toolbox();
+
+		// App Resize
+		window.addEventListener('resize', function(event) { 
+			viewport.setSize( window.innerWidth, window.innerHeight );
+		}, false);
+		
+		
+		// Start animating viewport
+		viewport.animate();
+		
 	});
 	
 })();

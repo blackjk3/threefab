@@ -37,6 +37,8 @@ THREEFAB.DragDropLoader = function() {
 				loader.createModel( JSON.parse(contents), function ( geometry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map:new THREEFAB.CanvasTexture() } );
+					material.name = 'MeshPhongMaterial';
+					
 					var mesh = new THREE.Mesh( geometry, material );
 					
 					$.publish('model/loaded', mesh);

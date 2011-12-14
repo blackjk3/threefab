@@ -286,9 +286,8 @@ THREEFAB.Viewport = function( parameters ) {
 	    		
 	    		_this.scene.remove(_this._SELECTED);
 	    		_this._SELECTED = null;
-	    		console.log("VIEWPORT :: Remove :: ");
-	    		console.log(_this.scene.children);
-	    		$.publish('viewport/object/removed');
+	    		
+	    		$.publish('viewport/object/removed', this.scene);
 	    	}
 	    }
 	});
@@ -301,7 +300,9 @@ THREEFAB.Viewport.prototype = {
 		var material, geometry, mesh, meshName, rotation, doubleSided=false;
 		
 		material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.NoShading, overdraw:false } );
-		material.ambient = material.color;		
+		material.name = 'MeshPhongMaterial';
+		material.ambient = material.color;
+		material.specular = material.color;		
 				
 		if(type === "sphere") {
 			geometry = new THREE.SphereGeometry(100,16,16);
@@ -338,6 +339,7 @@ THREEFAB.Viewport.prototype = {
 		}
 		
 		this.scene.add(mesh);
+		$.publish('viewport/object/added', this.scene);
 		
 		return mesh;
 	},
@@ -386,6 +388,7 @@ THREEFAB.Viewport.prototype = {
 	addModel:function(mesh) {
 		this.scene.add(mesh);
 		this.selected(mesh);
+		$.publish('viewport/object/added', this.scene);
 		
 		return mesh;
 	},
@@ -406,64 +409,17 @@ THREEFAB.Viewport.prototype = {
 		lightmesh.mesh.position.x = 100;
 		
 		this.resetMaterials();
+
+		$.publish('viewport/object/added', this.scene);
 		
 		return lightmesh;
 	},
 	
 	addTexture:function(tex) {
-		console.log(tex);
-		//this._SELECTED.material.map = tex;
-		//this._SELECTED.material.program = false;
-			
-		//THREE.ImageUtils.loadTexture( "img/UV.jpg", THREE.UVMapping, function(img){
-		//	var texture = new THREE.Texture(img, THREE.UVMapping);
-		//	console.log(texture);
-			
-			/*var mat = new THREE.MeshPhongMaterial( { map: tex } );		
-			
-			var geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
-			var meshName = 'THREE.PlaneGeometry';
-			var rotation = new THREE.Vector3(-Math.PI/2,0,0);
-			
-			var mesh = new THREE.Mesh(geometry, mat);
-			mesh.name = meshName + "." + mesh.id;
-			
-			mesh.rotation.copy(rotation);
-			mesh.material.map.needsUpdate = true;
-			
-			this.scene.add(mesh);*/
-			
-			
-		//});
 		
 		this._SELECTED.material.program = null;
 		this._SELECTED.material.map = tex;
-		
-		/*this._SELECTED.material.program = null;
-		this._SELECTED.geometry.__dirtyVertices = true;
-		this._SELECTED.geometry.__dirtyNormals = true;*/
-		
-		//this._SELECTED.material = new THREE.MeshPhongMaterial( { map: tex } );		
-		
-		
-		
-		//var geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
-		//var mesh = new THREE.Mesh(geometry, material);
-		//mesh.rotation.copy(new THREE.Vector3(-Math.PI/2,0,0));
-		//mesh.material.map.needsUpdate = true;
-		//this.scene.add(mesh);
-		
-		//this._SELECTED.material.map = tex;
-		
-		
-		//var mat = this._SELECTED.material;
-		
-		//this._SELECTED.material.program = false;	
-		//this._SELECTED.material = new THREE.MeshBasicMaterial({ map: tex });
-		//this._SELECTED.material.map.needsUpdate = true;
-		
-		
-		//this.resetMaterials();
+
 	},
 	
 	resetMaterials: function() {
@@ -485,6 +441,7 @@ THREEFAB.Viewport.prototype = {
 		var lightmesh = this.addLight('point');
 		
 		this._SELECTED = mesh;
+		$.publish('viewport/mesh/selected', mesh);
 	}	
 }
 	
