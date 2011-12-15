@@ -10,12 +10,13 @@
 THREEFAB.Ui = function(viewport) {
 	
 	var _viewport = viewport,
-		materialModel = new THREEFAB.MaterialModel(),
-		materialView = new THREEFAB.MaterialView({ model: materialModel, selected: viewport._SELECTED }),
-		transformView = new THREEFAB.TransformView({ viewport: viewport });
+		materialModel = new THREEFAB.MaterialModel();
+		
+	this.materialView = new THREEFAB.MaterialView({ model: materialModel, selected: viewport._SELECTED });
+	this.transformView = new THREEFAB.TransformView({ viewport: viewport });
 	
-	materialView.render();
-	transformView.render();
+	this.materialView.render();
+	this.transformView.render();
 	
 }
 
@@ -27,7 +28,7 @@ THREEFAB.Ui = function(viewport) {
 
 THREEFAB.Ui.utils = {
 	
-	addProperties: function(object, list, folder) {
+	addProperties: function(object, list, folder, view) {
 		
 		for(var i=0, len=list.length; i < len; i++) {
 			
@@ -46,15 +47,17 @@ THREEFAB.Ui.utils = {
 					args.push(list[i].values);
 				}
 				
-				folder.add.apply(folder, args);
+				tmp_controller = folder.add.apply(folder, args);
 							
 				if(list[i].step !== undefined) {
 					tmp_controller.step(list[i].step);
 				}
 				
-				//if(list[i].onChange !== undefined) {
-					//tmp_controller.onChange(rebuildMaterial);
-				//}
+				/*if(list[i].onChange !== undefined) {
+					
+					tmp_controller.onChange(view[list[i].onChange].apply(view, [undefined]));
+					console.log("Setup :: Changing Property :: ");
+				}*/
 			}
 		
 		}

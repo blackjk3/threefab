@@ -12,6 +12,8 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	el: '#gui-materials-container',
 	gui: {},
 	selected: {},
+	texture: {},
+	color: {},
 	
 	folders: {
 		materials:{},
@@ -28,7 +30,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	
 		$.subscribe('viewport/mesh/selected', this.meshChanged);
 		$.subscribe('viewport/light/selected', this.lightChanged);
-
+		$.subscribe('material/color/changed', this.changeColor);
 	},
 	
 	/**
@@ -43,11 +45,23 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		
 		// Add Folders
 		this.folders.materials = this.gui.addFolder('Material');
-		this.folders.lights = this.gui.addFolder('Light');
 		this.folders.textures = this.gui.addFolder('Texture');
+		this.folders.lights = this.gui.addFolder('Light');
+		
 		
 		this.folders.materials.open();
+		this.folders.textures.open();
+
+		// Material Color Chips
+		this.color = new THREEFAB.ColorView();
+		this.folders.materials.__ul.appendChild(this.color.el[0]);
+
 		this.addMaterialOptions();
+
+		// Texture Panel
+		this.texture = new THREEFAB.TextureView();
+		this.folders.textures.__ul.appendChild(this.texture.el[0]);
+		this.texture.render(this.selected);
 
 	},
 
@@ -68,7 +82,9 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.addMaterialOptions();
 		
 		this.folders.materials.open();
-	 	
+	 	this.folders.textures.open();
+	 	this.color.el.show();
+	 	this.texture.el.show();
 	 	
 		//this.rebuildMaterial();
 
@@ -85,6 +101,11 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		
 			
 		this.folders.materials.close();
+		this.color.el.hide();
+		
+		this.folders.textures.close();
+		this.texture.el.hide();
+
 		this.resetControllers();
 		
 		THREEFAB.Ui.utils.addProperties( object, this.model.lightList, this.folders.lights );
@@ -99,6 +120,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		THREEFAB.Ui.utils.removeFolderControllers( this.folders.materials );
 
 	},
+
 	
 	/**
 	 * Loops through the materialList from model and adds values to ui. 
@@ -113,23 +135,31 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.folders.materials.add(this.selected.material, 'name', {Basic: 'MeshBasicMaterial', Phong:'MeshPhongMaterial', Lambert: 'MeshLambertMaterial'}).onChange( this.rebuildMaterial );
 	
 		// Loop and add material properties.
-		THREEFAB.Ui.utils.addProperties(this.selected.material, this.model.materialList, this.folders.materials);
+		THREEFAB.Ui.utils.addProperties(this.selected.material, this.model.materialList, this.folders.materials, this);
 		
 		// Add color stuff.
 		// TODO: Fix this later with some sort of UI color util.
-		this.folders.materials.addColor(this.selected.material, 'color').onChange(function(e) {
-			this.selected.material.color = new THREE.Color().setRGB(e.r/255, e.g/255, e.b/255);
-		});
 		
+		//this.folders.materials.addColor(this.selected.material, 'color').onChange(this.changeColor);
+	},
+
+	changeColor: function(c, type) {
+		
+		this.selected.material[type] = new THREE.Color().setRGB(c.r/255, c.g/255, c.b/255);
+
+		if(type === 'ambient' || type === 'specular') {
+			this.rebuildMaterial();
+		}
 	},
 	
 	rebuildMaterial: function(matName){
+		
 		var mat;
 	
 		if(matName === undefined) {
 			matName = this.selected.material.name;
 		}
-	
+
 		// We can make a generic function constructor based on the material name.
 		mat = new THREE[matName]();
 		mat.name = matName;
@@ -152,6 +182,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		mat['map'] = this.selected.material['map'];
 		mat['color'] = this.selected.material['color'];
 		mat['ambient'] = this.selected.material['ambient'];
+		mat['specular'] = this.selected.material['specular'];
 		
 	}
 	

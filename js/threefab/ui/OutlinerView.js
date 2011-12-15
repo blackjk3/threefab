@@ -17,11 +17,16 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 		_.bindAll(this);
 		
 		this.el = $(this.el);
+		
 		this.select = $(this.select);
 		this.el.append(this.select);
+		this.select.bind('change', this.change);
 
 		$.subscribe( 'viewport/object/added', this.render );
 		$.subscribe( 'viewport/object/removed', this.render );
+		
+		$.subscribe('viewport/mesh/selected', this.updateSelected);
+		$.subscribe('viewport/light/selected', this.updateSelected);
 	},
 
 
@@ -29,6 +34,18 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 				
 		this.select.empty();
 		this.addOptions( scene.children );
+
+	},
+
+	change: function() {
+
+		$.publish( 'outliner/changed', this.select.val() );
+	},
+
+	updateSelected: function(object) {
+		
+		var name = object.name;
+		this.select.val(name);
 
 	},
 
@@ -43,7 +60,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 
 				opt = document.createElement('option');
 		        opt.innerHTML = children[i].name;
-		        opt.setAttribute('value', children[i].id);
+		        opt.setAttribute('value', children[i].name);
 		        this.select.append(opt);
 
 			}
