@@ -11,18 +11,21 @@
 	$(document).ready(function(){
 
 		var dragDrop = new THREEFAB.DragDropLoader(),
-	    viewport = new THREEFAB.Viewport(),
-	    ui = new THREEFAB.Ui(viewport),
-		toolbox = new THREEFAB.Toolbox();
+			viewport = new THREEFAB.Viewport(),
+			ui = new THREEFAB.Ui(viewport),
+			toolbox = new THREEFAB.Toolbox();
 
 		// App Resize
-		window.addEventListener('resize', function(event) { 
+		window.addEventListener('resize', function(event) {
 			viewport.setSize( window.innerWidth, window.innerHeight );
 		}, false);
 		
 		
 		// Start animating viewport
 		viewport.animate();
+
+		//var exporter = new THREEFAB.Exporter();
+		//exporter.generate(viewport);
 		
 	});
 	

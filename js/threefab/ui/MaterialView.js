@@ -1,9 +1,10 @@
-/** 
+/**
+ *
  * @class THREEFAB.MaterialView
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Setup for material view.
- * 
+ *
  */
 
 
@@ -18,9 +19,9 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	folders: {
 		materials:{},
 		lights:{},
-		textures:{},
+		textures:{}
 	},
-	
+
 	initialize: function() {
 		
 		_.bindAll(this);
@@ -33,9 +34,6 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		$.subscribe('material/color/changed', this.changeColor);
 	},
 	
-	/**
-	 *  Renders the current material dat.GUI view.
-	 */
 	
 	render: function() {
 		
@@ -65,13 +63,6 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 	},
 
-	/**
-	 * Listens to when the mesh changes and updates the material panel.
-	 * @function meshChanged
-	 * @param {THREE.Mesh} object
-	 *
-	 */
-
 	meshChanged: function(object) {
 
 		this.selected = object;
@@ -82,20 +73,14 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.addMaterialOptions();
 		
 		this.folders.materials.open();
-	 	this.folders.textures.open();
-	 	this.color.el.show();
-	 	this.texture.el.show();
-	 	
+		this.folders.textures.open();
+		this.color.el.show();
+		this.texture.el.show();
+		
 		//this.rebuildMaterial();
 
 	},
 
-	/**
-	 * Listens to when the light changes and updates the material panel.
-	 * @function lightChanged
-	 * @param {THREE.Mesh} object
-	 *
-	 */
 
 	lightChanged: function(object) {
 		
@@ -122,13 +107,6 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	},
 
 	
-	/**
-	 * Loops through the materialList from model and adds values to ui. 
-	 * 
-	 * @function MaterialView.addMaterialOptions
-	 * @see MaterialModel
-	 */
-	
 	addMaterialOptions: function() {
 		
 		// Add Material shader options.
@@ -136,11 +114,6 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	
 		// Loop and add material properties.
 		THREEFAB.Ui.utils.addProperties(this.selected.material, this.model.materialList, this.folders.materials, this);
-		
-		// Add color stuff.
-		// TODO: Fix this later with some sort of UI color util.
-		
-		//this.folders.materials.addColor(this.selected.material, 'color').onChange(this.changeColor);
 	},
 
 	changeColor: function(c, type) {
@@ -179,10 +152,10 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		}
 		
 		// Copy the map and color manually.
-		mat['map'] = this.selected.material['map'];
-		mat['color'] = this.selected.material['color'];
-		mat['ambient'] = this.selected.material['ambient'];
-		mat['specular'] = this.selected.material['specular'];
+		mat.map = this.selected.material.map;
+		mat.color = this.selected.material.color;
+		mat.ambient = this.selected.material.ambient;
+		mat.specular = this.selected.material.specular;
 		
 	}
 	

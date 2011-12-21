@@ -111,6 +111,8 @@
   <script src="js/threefab/textures/CanvasTexture.js"></script>
   
   <script src="js/threefab/extras/loaders/DragDropLoader.js"></script>
+  <script src="js/threefab/extras/exporter/Exporter.js"></script>
+
   <script src="js/threefab/lights/PointLightContainer.js"></script>
   <script src="js/threefab/lights/SpotLightContainer.js"></script>
   <script src="js/threefab/lights/AmbientLightContainer.js"></script>
@@ -135,6 +137,10 @@
     <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
-  
+<script type="x-jquery-tmpl" id="material">
+<div>
+  var material = new THREE.${name};<br>
+</div>  
+</script>
 </body>
 </html>

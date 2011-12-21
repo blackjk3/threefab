@@ -1,9 +1,9 @@
-/** 
+/**
  * @class THREEFAB.ColorView
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Setup color view.
- * 
+ *
  */
 
 

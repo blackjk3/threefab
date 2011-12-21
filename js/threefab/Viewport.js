@@ -10,7 +10,7 @@
 THREEFAB.Viewport = function( parameters ) {
 	
 	var _radius = 500,
-	    _height = window.innerHeight,
+		_height = window.innerHeight,
 		_width  = window.innerWidth,
 		_this = this,
 		_container = document.createElement( 'div' ),
@@ -25,7 +25,7 @@ THREEFAB.Viewport = function( parameters ) {
 	
 	_container.style.position = 'absolute';
 	_container.style.overflow = 'hidden';
-		
+
 	parameters = parameters || {};
 	
 	this.grid = parameters.grid !== undefined ? parameters.grid : true;	
@@ -75,7 +75,7 @@ THREEFAB.Viewport = function( parameters ) {
 	//Grid
 	if(this.grid) {
 		this.grid = new THREE.Grid();
-	  	this.scene.add(this.grid);
+		this.scene.add(this.grid);
 			
 		// Axis
 		this.manipulator = new THREE.ManipulatorTool();
@@ -160,16 +160,12 @@ THREEFAB.Viewport = function( parameters ) {
 		_this.manipulator.position.copy( _this._SELECTED.position );
 	};
 
-	/** 
-	 * Private functions
-	 *
-	*/
 
 	function outlinerChanged(name) {
 		
 		var child = _this.scene.getChildByName(name);
 		_this.selected(child);
-	};
+	}
 	
 	
 	// =============================================================================
@@ -236,7 +232,7 @@ THREEFAB.Viewport = function( parameters ) {
 	
 		event.preventDefault();
 		
-		_prev_mouse.x = _mouse.x,
+		_prev_mouse.x = _mouse.x;
 		_prev_mouse.y = _mouse.y;
 	
 		_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -269,20 +265,20 @@ THREEFAB.Viewport = function( parameters ) {
 		
 		var code;
 		
-	    if (!e) {var e = window.event;}
-	    if (e.keyCode) { 
-	    	code = e.keyCode;
-	    } else if (e.which) {
-	    	code = e.which;
-	    }
-	    
-	    if (code === 88) {
-	    	if(_this._SELECTED) {
-	    		
-	    		if(_this._SELECTED.light) {
-	    			_this.scene.remove(_this._SELECTED.light);
-	    		} 
-	    		
+		if (!e) { e = window.event; }
+		if (e.keyCode) { 
+			code = e.keyCode;
+		} else if (e.which) {
+			code = e.which;
+		}
+		
+		if (code === 88) {
+			if(_this._SELECTED) {
+				
+			if(_this._SELECTED.light) {
+				_this.scene.remove(_this._SELECTED.light);
+			} 
+				
 	    		_this.scene.remove(_this._SELECTED);
 
 	    		//_this._SELECTED = null;
@@ -296,9 +292,9 @@ THREEFAB.Viewport = function( parameters ) {
 					}
 				} 
 
-	    		$.publish('viewport/object/removed', _this.scene);
-	    	}
-	    }
+				$.publish('viewport/object/removed', _this.scene);
+			}
+		}
 	});
 };
 
@@ -363,37 +359,25 @@ THREEFAB.Viewport.prototype = {
 	addParticleSystem: function() {
 		// create the particle variables
 		var particleCount = 1800,
-		    particles = new THREE.Geometry(),
-		    pMaterial = new THREE.ParticleBasicMaterial({
-		        color: 0xFFFFFF,
-		        size: Math.random() * 25 + 10,
-		        map: THREE.ImageUtils.loadTexture(
-		            "img/particle.png"
-		        ),
-		        blending: THREE.AdditiveBlending,
-		        transparent: true
-		    });
+			particles = new THREE.Geometry(),
+			pMaterial = new THREE.ParticleBasicMaterial({ color: 0xFFFFFF, size: Math.random() * 25 + 10, map: THREE.ImageUtils.loadTexture( "img/particle.png" ), blending: THREE.AdditiveBlending, transparent: true });
 		
 		// now create the individual particles
 		for(var p = 0; p < particleCount; p++) {
 		
-		    // create a particle with random
-		    // position values, -250 -> 250
-		    var pX = Math.random() * 500 - 250,
-		        pY = Math.random() * 500 - 250,
-		        pZ = Math.random() * 500 - 250,
-		        particle = new THREE.Vertex(
-		            new THREE.Vector3(pX, pY, pZ)
-		        );
+			// create a particle with random
+			// position values, -250 -> 250
+			var pX = Math.random() * 500 - 250,
+		    	pY = Math.random() * 500 - 250,
+		    	pZ = Math.random() * 500 - 250,
+		    	particle = new THREE.Vertex( new THREE.Vector3(pX, pY, pZ) );
 		    
 		    // add it to the geometry
 		    particles.vertices.push(particle);
 		}
 		
 		// create the particle system
-		var particleSystem = new THREE.ParticleSystem(
-		    particles,
-		    pMaterial);
+		var particleSystem = new THREE.ParticleSystem( particles, pMaterial);
 		
 		particleSystem.sortParticles = true;
 		
@@ -468,5 +452,5 @@ THREEFAB.Viewport.prototype = {
 
 		$.publish('viewport/mesh/selected', mesh);
 	}	
-}
+};
 	

@@ -18,7 +18,7 @@ THREEFAB.Ui = function(viewport) {
 	this.materialView.render();
 	this.transformView.render();
 	
-}
+};
 
 
 /**

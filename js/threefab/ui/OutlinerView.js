@@ -56,13 +56,12 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 		
 		for(var i=0, len = children.length; i < len; i++) {
 		
-			if(children[i].name) {   	
+			if(children[i].name) {	
 
 				opt = document.createElement('option');
-		        opt.innerHTML = children[i].name;
-		        opt.setAttribute('value', children[i].name);
-		        this.select.append(opt);
-
+				opt.innerHTML = children[i].name;
+				opt.setAttribute('value', children[i].name);
+				this.select.append(opt);
 			}
 
 		}

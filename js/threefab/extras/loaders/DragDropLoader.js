@@ -18,25 +18,29 @@ THREEFAB.DragDropLoader = function() {
 		event.preventDefault();
 
 		var file = event.dataTransfer.files[ 0 ];
+
+		if(file === undefined) { return false; }
+
 		var extension = file.name.split( '.' )[1].toLowerCase();
 		var reader = new FileReader();
 		var isImage = false;
 
 		if(extension === "jpg" || extension === "png") {
 			isImage = true;
-		}	
+		}
 
 		reader.onload = function ( event ) {
 			var contents = event.target.result,
-				loader;				
+				loader;
 			
 			if(extension === "js") {
 				// We dropping in a mesh.
-				    
-			    loader = new THREE.JSONLoader();
+
+				loader = new THREE.JSONLoader();
 				loader.createModel( JSON.parse(contents), function ( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map:new THREEFAB.CanvasTexture() } );
+					// This is a valid model.
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture() } );
 					material.name = 'MeshPhongMaterial';
 					
 					var mesh = new THREE.Mesh( geometry, material );
@@ -45,14 +49,17 @@ THREEFAB.DragDropLoader = function() {
 
 				});
 			} else if(isImage) {
+
 				// We are dropping in a texture.
+				
 				var img = new Image();
 				img.src = contents;
 				
 				var texture = new THREE.Texture(img);
 				texture.needsUpdate = true;
 				
-				$.publish('texture/loaded', texture);	
+				$.publish('texture/loaded', texture);
+			
 			}
 			
 		};
@@ -60,8 +67,8 @@ THREEFAB.DragDropLoader = function() {
 		if(extension === 'js') {
 			reader.readAsText( file );
 		} else if(isImage) {
-			reader.readAsDataURL(file);	
+			reader.readAsDataURL(file);
 		}
 				
-	});				
+	});
 };
