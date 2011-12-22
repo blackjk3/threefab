@@ -10,9 +10,9 @@ THREEFAB.Toolbox = Backbone.View.extend({
 			
 			if(target.tagName.toLowerCase() === "a") {
 				className = target.className;
-				$.publish('primitive/add', target.className);				
+				$.publish(THREEFAB.Events.PRIMITIVE_ADDED, target.className);
 			}
-		});	
+		});
 		
 		$('.light-list').bind('click', function(event) {
 			event.preventDefault();
@@ -22,7 +22,7 @@ THREEFAB.Toolbox = Backbone.View.extend({
 			
 			if(target.tagName.toLowerCase() === "a") {
 				className = target.className;
-				$.publish('light/add', target.className);
+				$.publish(THREEFAB.Events.LIGHT_ADDED, target.className);
 			}
 		});
 	}

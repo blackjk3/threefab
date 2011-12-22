@@ -1,9 +1,9 @@
-/** 
+/**
  * @class THREEFAB.TransformView
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Setup transform view.
- * 
+ *
  */
 
 
@@ -18,7 +18,7 @@ THREEFAB.TransformView = Backbone.View.extend({
 	folders: {
 		camera:{},
 		outliner:{},
-		transforms:{},
+		transforms:{}
 	},
 	
 	initialize: function() {
@@ -29,8 +29,8 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.viewport = arguments[0].viewport;
 
 		// Listen to when an object is selected.
-		$.subscribe('viewport/mesh/selected', this.addTransformOptions);
-		$.subscribe('viewport/light/selected', this.addTransformOptions);
+		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.addTransformOptions);
+		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.addTransformOptions);
 
 	},
 	
@@ -94,7 +94,7 @@ THREEFAB.TransformView = Backbone.View.extend({
 		
 		if(!selected.light) {
 			
-			// Scale 
+			// Scale
 			this.folders.transforms.add(selected.scale, 'x', 0);
 			this.folders.transforms.add(selected.scale, 'y', 0);
 			this.folders.transforms.add(selected.scale, 'z', 0);

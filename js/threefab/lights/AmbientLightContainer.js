@@ -11,7 +11,7 @@ THREEFAB.AmbientLightContainer = function ( scene, hex) {
 		
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vertex() );
-	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 15, 1 ) ) );	
+	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 15, 1 ) ) );
 	
 	var lineMat = new THREE.LineBasicMaterial( { color : 0xFFFFFF } );
 	

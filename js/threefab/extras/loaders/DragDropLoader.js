@@ -45,7 +45,7 @@ THREEFAB.DragDropLoader = function() {
 					
 					var mesh = new THREE.Mesh( geometry, material );
 					
-					$.publish('model/loaded', mesh);
+					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
 				});
 			} else if(isImage) {
@@ -58,7 +58,7 @@ THREEFAB.DragDropLoader = function() {
 				var texture = new THREE.Texture(img);
 				texture.needsUpdate = true;
 				
-				$.publish('texture/loaded', texture);
+				$.publish(THREEFAB.Events.TEXTURE_LOADED, texture);
 			
 			}
 			

@@ -1,9 +1,9 @@
-/** 
+/**
  * @class THREEFAB.OutlinerView
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Setup outliner view.
- * 
+ *
  */
 
 
@@ -22,11 +22,11 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 		this.el.append(this.select);
 		this.select.bind('change', this.change);
 
-		$.subscribe( 'viewport/object/added', this.render );
-		$.subscribe( 'viewport/object/removed', this.render );
+		$.subscribe( THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.render );
+		$.subscribe( THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, this.render );
 		
-		$.subscribe('viewport/mesh/selected', this.updateSelected);
-		$.subscribe('viewport/light/selected', this.updateSelected);
+		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.updateSelected);
+		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.updateSelected);
 	},
 
 
@@ -39,7 +39,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 
 	change: function() {
 
-		$.publish( 'outliner/changed', this.select.val() );
+		$.publish( THREEFAB.Events.OUTLINER_CHANGED, this.select.val() );
 	},
 
 	updateSelected: function(object) {
@@ -56,7 +56,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 		
 		for(var i=0, len = children.length; i < len; i++) {
 		
-			if(children[i].name) {	
+			if(children[i].name) {
 
 				opt = document.createElement('option');
 				opt.innerHTML = children[i].name;

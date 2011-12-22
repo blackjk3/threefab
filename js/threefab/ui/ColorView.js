@@ -37,7 +37,7 @@ THREEFAB.ColorView = Backbone.View.extend({
 		this.el.append( this.types.ambient );
 		this.el.append( this.types.specular );
 
-		$.subscribe('viewport/mesh/selected', this.meshChanged);
+		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.meshChanged);
 	},
 
 	meshChanged: function( object ) {
@@ -54,19 +54,19 @@ THREEFAB.ColorView = Backbone.View.extend({
 	changeColor: function( hsb, hex, rgb ) {
 	
 		this.update(this.types.color, rgb);
-		$.publish('material/color/changed', [rgb, 'color']);
+		$.publish(THREEFAB.Events.MATERIAL_COLOR_CHANGED, [rgb, 'color']);
 	},
 
 	changeAmbient: function( hsb, hex, rgb ) {
 	
 		this.update(this.types.ambient, rgb);
-		$.publish('material/color/changed', [rgb, 'ambient']);
+		$.publish(THREEFAB.Events.MATERIAL_COLOR_CHANGED, [rgb, 'ambient']);
 	},
 
 	changeSpecular: function( hsb, hex, rgb ) {
 	
 		this.update(this.types.specular, rgb);
-		$.publish('material/color/changed', [rgb, 'specular']);
+		$.publish(THREEFAB.Events.MATERIAL_COLOR_CHANGED, [rgb, 'specular']);
 	},
 
 	update: function(type, rgb) {

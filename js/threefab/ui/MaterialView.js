@@ -15,6 +15,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	selected: {},
 	texture: {},
 	color: {},
+	light: {},
 	
 	folders: {
 		materials:{},
@@ -29,9 +30,10 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.el = $(this.el);
 		this.selected = arguments[0].selected;
 	
-		$.subscribe('viewport/mesh/selected', this.meshChanged);
-		$.subscribe('viewport/light/selected', this.lightChanged);
-		$.subscribe('material/color/changed', this.changeColor);
+		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.meshChanged);
+		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.lightChanged);
+		$.subscribe(THREEFAB.Events.MATERIAL_COLOR_CHANGED, this.changeColor);
+		$.subscribe(THREEFAB.Events.LIGHT_COLOR_CHANGED, this.changeColor);
 	},
 	
 	
@@ -61,6 +63,10 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.folders.textures.__ul.appendChild(this.texture.el[0]);
 		this.texture.render(this.selected);
 
+		// Light view
+		this.light = new THREEFAB.LightView();
+		this.folders.lights.__ul.appendChild(this.light.el[0]);
+		this.light.el.hide();
 	},
 
 	meshChanged: function(object) {
@@ -77,6 +83,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.color.el.show();
 		this.texture.el.show();
 		
+		this.light.el.hide();
 		//this.rebuildMaterial();
 
 	},
@@ -84,6 +91,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 	lightChanged: function(object) {
 		
+		this.light.el.show();
 			
 		this.folders.materials.close();
 		this.color.el.hide();
@@ -123,6 +131,10 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		if(type === 'ambient' || type === 'specular') {
 			this.rebuildMaterial();
 		}
+	},
+
+	changeLightColor: function(c) {
+		this.selected.mesh.light.color = new THREE.Color().setRGB(c.r/255, c.g/255, c.b/255);
 	},
 	
 	rebuildMaterial: function(matName){

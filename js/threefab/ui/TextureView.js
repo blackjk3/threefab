@@ -1,9 +1,9 @@
-/** 
+/**
  * @class THREEFAB.TextureView
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Setup texture view.
- * 
+ *
  */
 
 
@@ -31,9 +31,9 @@ THREEFAB.TextureView = Backbone.View.extend({
 		this.el.append(this.texture);
 		this.el.append(this.label);
 
-		$.subscribe('viewport/mesh/selected', this.render);
-		$.subscribe('viewport/light/selected', this.render);
-		$.subscribe('viewport/object/texture/added', this.render);
+		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.render);
+		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.render);
+		$.subscribe(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this.render);
 	},
 
 
@@ -55,14 +55,14 @@ THREEFAB.TextureView = Backbone.View.extend({
 			}
 		} else {
 			this.reset();
-		}		
+		}
 	},
 
 	clear: function() {
 		
 		this.reset();
 
-		$.publish('texture/clear');
+		$.publish(THREEFAB.Events.TEXTURE_CLEAR);
 
 	},
 

@@ -20,7 +20,7 @@ THREEFAB.Viewport = function( parameters ) {
 		_SELECTED_DOWN = false,
 		_SELECTED_AXIS,
 		_projector = new THREE.Projector(),
-		SHADOW_MAP_WIDTH = 2048, 
+		SHADOW_MAP_WIDTH = 2048,
 		SHADOW_MAP_HEIGHT = 1024;
 	
 	_container.style.position = 'absolute';
@@ -28,7 +28,7 @@ THREEFAB.Viewport = function( parameters ) {
 
 	parameters = parameters || {};
 	
-	this.grid = parameters.grid !== undefined ? parameters.grid : true;	
+	this.grid = parameters.grid !== undefined ? parameters.grid : true;
 		
 	// Add basic scene container
 	document.body.appendChild( _container );
@@ -70,7 +70,7 @@ THREEFAB.Viewport = function( parameters ) {
 	this.controls.keys = [ 65, 83, 68 ]; // [ rotateKey, zoomKey, panKey ]
 	
 	// Scene
-	this.scene = new THREE.Scene();	
+	this.scene = new THREE.Scene();
 	
 	//Grid
 	if(this.grid) {
@@ -83,13 +83,13 @@ THREEFAB.Viewport = function( parameters ) {
 	}
 	
 	// Drag and drop functionality
-	$.subscribe('model/loaded', $.proxy(this.addModel, this));
-	$.subscribe('texture/loaded', $.proxy(this.addTexture, this));
-	$.subscribe('primitive/add', $.proxy(this.addPrimitive, this));
-	$.subscribe('light/add', $.proxy(this.addLight, this));
-	$.subscribe('texture/clear', $.proxy(this.clearTexture, this));
+	$.subscribe(THREEFAB.Events.MODEL_LOADED, $.proxy(this.addModel, this));
+	$.subscribe(THREEFAB.Events.TEXTURE_LOADED, $.proxy(this.addTexture, this));
+	$.subscribe(THREEFAB.Events.PRIMITIVE_ADDED, $.proxy(this.addPrimitive, this));
+	$.subscribe(THREEFAB.Events.LIGHT_ADDED, $.proxy(this.addLight, this));
+	$.subscribe(THREEFAB.Events.TEXTURE_CLEAR, $.proxy(this.clearTexture, this));
 
-	$.subscribe('outliner/changed', outlinerChanged);
+	$.subscribe(THREEFAB.Events.OUTLINER_CHANGED, outlinerChanged);
 
 	// =============================================================================
 	// DEFAULT Light, Cube.  JUST LIKE BLENDER
@@ -137,10 +137,10 @@ THREEFAB.Viewport = function( parameters ) {
 		
 		if(!_this._SELECTED.light) {
 			// It's a mesh!
-			$.publish('viewport/mesh/selected', object);
+			$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, object);
 		} else {
 			// It's a light!
-			$.publish('viewport/light/selected', object);
+			$.publish(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, object);
 			_this._SELECTED.material.program = null;
 			_this._SELECTED.material.overdraw = true;
 		}
@@ -178,7 +178,7 @@ THREEFAB.Viewport = function( parameters ) {
 	// Mouse Down
 	// ----------------------------------------
 	
-	this.renderer.domElement.addEventListener( 'mousedown', function ( event ) { 
+	this.renderer.domElement.addEventListener( 'mousedown', function ( event ) {
 		
 		event.preventDefault();
 		
@@ -207,7 +207,7 @@ THREEFAB.Viewport = function( parameters ) {
 
 			}
 
-		} 
+		}
 		
 		// Log the camera postion. If it moves then don't deselect any selected items.
 		_prev_camera = _this.camera;
@@ -217,7 +217,7 @@ THREEFAB.Viewport = function( parameters ) {
 	// Mouse up
 	// ----------------------------------------
 	
-	this.renderer.domElement.addEventListener('mouseup', function(event) { 
+	this.renderer.domElement.addEventListener('mouseup', function(event) {
 		
 		event.preventDefault();
 		_this.deselect();
@@ -241,7 +241,7 @@ THREEFAB.Viewport = function( parameters ) {
 		if ( _SELECTED_AXIS && _this._SELECTED ) {
 	
 			var tx = (_mouse.x - _prev_mouse.x) * 1000;
-			var ty = (_mouse.y - _prev_mouse.y) * 1000;	
+			var ty = (_mouse.y - _prev_mouse.y) * 1000;
 			
 			if(_SELECTED_AXIS.name === "x_manipulator") {
 				_this.manipulator.translateX(tx);
@@ -266,7 +266,7 @@ THREEFAB.Viewport = function( parameters ) {
 		var code;
 		
 		if (!e) { e = window.event; }
-		if (e.keyCode) { 
+		if (e.keyCode) {
 			code = e.keyCode;
 		} else if (e.which) {
 			code = e.which;
@@ -275,24 +275,22 @@ THREEFAB.Viewport = function( parameters ) {
 		if (code === 88) {
 			if(_this._SELECTED) {
 				
-			if(_this._SELECTED.light) {
-				_this.scene.remove(_this._SELECTED.light);
-			} 
+				if(_this._SELECTED.light) {
+					_this.scene.remove(_this._SELECTED.light);
+				}
 				
-	    		_this.scene.remove(_this._SELECTED);
+				_this.scene.remove(_this._SELECTED);
 
-	    		//_this._SELECTED = null;
-	    		
-	    		// Get the next mesh and select that one
-	    		for(var i=0, len = _this.scene.children.length; i < len; i++) {
+				// Get the next mesh and select that one
+				for(var i=0, len = _this.scene.children.length; i < len; i++) {
 		
 					if(_this.scene.children[i].name) {
 						_this.selected(_this.scene.children[i]);
 						break;
 					}
-				} 
+				}
 
-				$.publish('viewport/object/removed', _this.scene);
+				$.publish(THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, _this.scene);
 			}
 		}
 	});
@@ -304,16 +302,16 @@ THREEFAB.Viewport.prototype = {
 
 	addPrimitive: function(type) {
 		
-		var material, 
-			geometry, 
-			mesh, 
-			meshName, 
-			rotation, 
+		var material,
+			geometry,
+			mesh,
+			meshName,
+			rotation,
 			doubleSided = false;
 		
 		
 		material = new THREE.MeshPhongMaterial( { wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.SmoothShading, overdraw:false } );
-		material.name = 'MeshPhongMaterial';	
+		material.name = 'MeshPhongMaterial';
 				
 		if(type === "sphere") {
 			geometry = new THREE.SphereGeometry(100,16,16);
@@ -327,12 +325,12 @@ THREEFAB.Viewport.prototype = {
 		} else if(type === "cone") {
 			geometry = new THREE.CylinderGeometry( 0, 50, 100, 16, 1 );
 			meshName = 'THREE.ConeGeometry';
-		} else if(type === "plane") {	
+		} else if(type === "plane") {
 			geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );
 			meshName = 'THREE.PlaneGeometry';
 			rotation = new THREE.Vector3(-Math.PI/2,0,0);
 			doubleSided = true;
-		} else if(type === "torus") {	
+		} else if(type === "torus") {
 			geometry = new THREE.TorusGeometry();
 			rotation = new THREE.Vector3(-Math.PI/2,0,0);
 			meshName = 'THREE.TorusGeometry';
@@ -351,7 +349,7 @@ THREEFAB.Viewport.prototype = {
 		
 		this.scene.add(mesh);
 
-		$.publish('viewport/object/added', this.scene);
+		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
 		
 		return mesh;
 	},
@@ -368,12 +366,12 @@ THREEFAB.Viewport.prototype = {
 			// create a particle with random
 			// position values, -250 -> 250
 			var pX = Math.random() * 500 - 250,
-		    	pY = Math.random() * 500 - 250,
-		    	pZ = Math.random() * 500 - 250,
-		    	particle = new THREE.Vertex( new THREE.Vector3(pX, pY, pZ) );
-		    
-		    // add it to the geometry
-		    particles.vertices.push(particle);
+				pY = Math.random() * 500 - 250,
+				pZ = Math.random() * 500 - 250,
+				particle = new THREE.Vertex( new THREE.Vector3(pX, pY, pZ) );
+		
+			// add it to the geometry
+			particles.vertices.push(particle);
 		}
 		
 		// create the particle system
@@ -388,7 +386,7 @@ THREEFAB.Viewport.prototype = {
 	addModel:function(mesh) {
 		this.scene.add(mesh);
 		this.selected(mesh);
-		$.publish('viewport/object/added', this.scene);
+		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
 		
 		return mesh;
 	},
@@ -407,10 +405,12 @@ THREEFAB.Viewport.prototype = {
 		
 		lightmesh.mesh.position.y = 150;
 		lightmesh.mesh.position.x = 100;
+
+		console.log(lightmesh.mesh.light);
 		
 		this.resetMaterials();
 
-		$.publish('viewport/object/added', this.scene);
+		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
 		
 		return lightmesh;
 	},
@@ -420,7 +420,7 @@ THREEFAB.Viewport.prototype = {
 		this._SELECTED.material.program = null;
 		this._SELECTED.material.map = tex;
 
-		$.publish('viewport/object/texture/added', this._SELECTED);
+		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);
 	},
 
 	clearTexture: function() {
@@ -450,7 +450,7 @@ THREEFAB.Viewport.prototype = {
 		
 		this._SELECTED = mesh;
 
-		$.publish('viewport/mesh/selected', mesh);
-	}	
+		$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, mesh);
+	}
 };
 	
