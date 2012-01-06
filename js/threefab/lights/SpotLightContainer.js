@@ -20,13 +20,13 @@ THREEFAB.SpotLightContainer = function ( scene, hex, intensity, distance ) {
 	
 	
 	var light = new THREE.SpotLight(hex, intensity, distance, true);
+	light.name = 'THREE.SpotLight';
 	
 	// Link light position and rotation to the fake holder object.
 	light.position = mesh.position;
 	light.rotation = mesh.rotation;
 	
 	mesh.light = light;
-	console.log(light);
 	
 	scene.add(mesh);
 	scene.add(light);

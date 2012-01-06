@@ -22,6 +22,7 @@ THREEFAB.TextureView = Backbone.View.extend({
 		this.el.css({height:40, paddingTop:'5px'});
 		this.texture.width = this.texture.height = 30;
 		this.texture = $(this.texture);
+		this.texture.addClass('texture-container');
 
 		this.label = $(this.label);
 		this.label.html('X');

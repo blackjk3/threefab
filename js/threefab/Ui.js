@@ -1,10 +1,10 @@
-/** 
+/**
  * @class THREEFAB.Ui
- * 
+ *
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
  * @description Sets up ui components for threefab.  Dependency on dat.gui.
- * @param [THREEFAB.Viewport] viewport The instance of the viewport class.	
- * 
+ * @param [THREEFAB.Viewport] viewport The instance of the viewport class.
+ *
  */
  
 THREEFAB.Ui = function(viewport) {

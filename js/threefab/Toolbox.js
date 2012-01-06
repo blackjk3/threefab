@@ -25,5 +25,9 @@ THREEFAB.Toolbox = Backbone.View.extend({
 				$.publish(THREEFAB.Events.LIGHT_ADDED, target.className);
 			}
 		});
+
+		$('.export').bind('click', function(event) {
+			$.publish(THREEFAB.Events.EXPORTER_GENERATE);
+		});
 	}
 });

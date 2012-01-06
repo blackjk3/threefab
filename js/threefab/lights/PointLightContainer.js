@@ -20,6 +20,7 @@ THREEFAB.PointLightContainer = function ( scene, hex, intensity, distance ) {
 	
 	
 	var light = new THREE.PointLight(hex, intensity, distance);
+	light.name = 'THREE.PointLight';
 	
 	// Link light position and rotation to the fake holder object.
 	light.position = mesh.position;

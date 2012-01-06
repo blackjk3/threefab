@@ -21,6 +21,7 @@ THREEFAB.Events = {
 	TEXTURE_CLEAR: 'texture/clear',
 
 	PRIMITIVE_ADDED: 'primitive/add',
-	LIGHT_ADDED: 'light/add'
+	LIGHT_ADDED: 'light/add',
 
+	EXPORTER_GENERATE: 'exporter/generate'
 };

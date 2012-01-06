@@ -31,8 +31,8 @@ THREEFAB.LightView = Backbone.View.extend({
 	},
 
 	lightChanged: function( object ) {
-		
-		var color = { r: object.material.color.r*255, g:object.material.color.g*255, b:object.material.color.b*255 };
+		console.log(object);
+		var color = { r: object.light.color.r*255, g:object.light.color.g*255, b:object.light.color.b*255 };
 
 		this.update( this.types.color, color );
 	},

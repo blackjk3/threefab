@@ -33,7 +33,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.meshChanged);
 		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.lightChanged);
 		$.subscribe(THREEFAB.Events.MATERIAL_COLOR_CHANGED, this.changeColor);
-		$.subscribe(THREEFAB.Events.LIGHT_COLOR_CHANGED, this.changeColor);
+		$.subscribe(THREEFAB.Events.LIGHT_COLOR_CHANGED, this.changeLightColor);
 	},
 	
 	
@@ -47,7 +47,6 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.folders.materials = this.gui.addFolder('Material');
 		this.folders.textures = this.gui.addFolder('Texture');
 		this.folders.lights = this.gui.addFolder('Light');
-		
 		
 		this.folders.materials.open();
 		this.folders.textures.open();
@@ -91,6 +90,8 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 	lightChanged: function(object) {
 		
+		this.selected = object;
+
 		this.light.el.show();
 			
 		this.folders.materials.close();
@@ -101,7 +102,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 		this.resetControllers();
 		
-		THREEFAB.Ui.utils.addProperties( object, this.model.lightList, this.folders.lights );
+		THREEFAB.Ui.utils.addProperties( object.light, this.model.lightList, this.folders.lights );
 		
 		this.folders.lights.open();
 
@@ -134,7 +135,8 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	},
 
 	changeLightColor: function(c) {
-		this.selected.mesh.light.color = new THREE.Color().setRGB(c.r/255, c.g/255, c.b/255);
+		console.log(this.selected);
+		this.selected.light.color = new THREE.Color().setRGB(c.r/255, c.g/255, c.b/255);
 	},
 	
 	rebuildMaterial: function(matName){

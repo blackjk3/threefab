@@ -23,17 +23,17 @@ THREEFAB.AmbientLightContainer = function ( scene, hex) {
 		mesh.add( line );
 	}
 	
-	mesh.name = "THREE.PointLightContainer." + mesh.id;
+	mesh.name = "THREE.AmbientLightContainer." + mesh.id;
 	
 	
 	var light = new THREE.AmbientLight(hex);
+	light.name = 'THREE.AmbientLight';
 	
 	// Link light position and rotation to the fake holder object.
 	light.position = mesh.position;
 	light.rotation = mesh.rotation;
 	
 	mesh.light = light;
-	console.log(light);
 	
 	scene.add(mesh);
 	scene.add(light);

@@ -334,58 +334,75 @@ body {
   left: 0;
   z-index: 2;
 }
-#toolbox ul.toolbox-list {
+#toolbox #logo {
+  float: left;
+  width: 209px;
+  height: 35px;
+  background: url(../img/logo.png);
+}
+#toolbox .righttools {
   float: right;
+}
+#toolbox .righttools ul.export-list {
+  float: left;
+  margin: 3px 0;
+  padding: 0 15px 0 0;
+}
+#toolbox .righttools ul.export-list li {
+  list-style: none;
+}
+#toolbox .righttools ul.toolbox-list {
+  float: left;
   margin: 0;
   padding: 0 15px 0 0;
 }
-#toolbox ul.toolbox-list li {
+#toolbox .righttools ul.toolbox-list li {
   float: left;
   list-style: none;
 }
-#toolbox ul.toolbox-list li a {
+#toolbox .righttools ul.toolbox-list li a {
   display: block;
   width: 35px;
   height: 35px;
   background: url(../img/toolbox.png);
 }
-#toolbox ul.toolbox-list li a.cube {
+#toolbox .righttools ul.toolbox-list li a.cube {
   background-position: -35px 0;
 }
-#toolbox ul.toolbox-list li a.cylinder {
+#toolbox .righttools ul.toolbox-list li a.cylinder {
   background-position: -70px 0;
 }
-#toolbox ul.toolbox-list li a.cone {
+#toolbox .righttools ul.toolbox-list li a.cone {
   background-position: -105px 0;
 }
-#toolbox ul.toolbox-list li a.plane {
+#toolbox .righttools ul.toolbox-list li a.plane {
   background-position: -140px 0;
 }
-#toolbox ul.toolbox-list li a.torus {
+#toolbox .righttools ul.toolbox-list li a.torus {
   background-position: -175px 0;
 }
-#toolbox ul.light-list {
-  float: right;
+#toolbox .righttools ul.light-list {
+  float: left;
   margin: 0;
   padding: 0 15px 0 0;
 }
-#toolbox ul.light-list li {
+#toolbox .righttools ul.light-list li {
   float: left;
   list-style: none;
 }
-#toolbox ul.light-list li a {
+#toolbox .righttools ul.light-list li a {
   display: block;
   width: 35px;
   height: 35px;
   background: url(../img/lights.png);
 }
-#toolbox ul.light-list li a.spot {
+#toolbox .righttools ul.light-list li a.spot {
   background-position: -35px 0;
 }
-#toolbox ul.light-list li a.ambient {
+#toolbox .righttools ul.light-list li a.ambient {
   background-position: -70px 0;
 }
-#toolbox ul.light-list li a.directional {
+#toolbox .righttools ul.light-list li a.directional {
   background-position: -105px 0;
 }
 #gui-transform-container {
@@ -440,6 +457,17 @@ body {
 .fl {
   float: left;
 }
+.button {
+  background: whiteSmoke;
+  background-image: -moz-linear-gradient(top, #f5f5f5, #f1f1f1);
+  background-image: -ms-linear-gradient(top, #f5f5f5, #f1f1f1);
+  background-image: -o-linear-gradient(top, #f5f5f5, #f1f1f1);
+  background-image: linear-gradient(top, #f5f5f5, #f1f1f1);
+  background: whiteSmoke;
+  border: 1px solid gainsboro;
+  margin: 0 -1px;
+  height: 27px;
+}
 .color_preview_container {
   float: left;
   padding-right: 20px;
@@ -452,18 +480,94 @@ body {
   cursor: pointer;
   border: 4px solid #333333;
 }
+.texture-container {
+  cursor: pointer;
+  border: 4px solid #333333;
+}
 .code-container {
+  display: none;
   z-index: 100;
+  top: 35px;
   position: absolute;
   background: #333333;
   width: 800px;
   height: 500px;
   background: #f5f2f0 url(../img/noise.png);
-  box-shadow: 0 0.3em 1em -0.4em black inset;
+  box-shadow: 0 0.3em 1em -0.4em #000000 inset;
   padding: 15px;
+  overflow: scroll;
 }
 .code-container pre {
   font-size: 12px;
+}
+.modal .popover, .modal .twipsy {
+  z-index: 12000;
+}
+.twipsy {
+  display: block;
+  position: absolute;
+  visibility: visible;
+  padding: 5px;
+  font-size: 11px;
+  z-index: 1000;
+  filter: alpha(opacity=80);
+  -khtml-opacity: 0.8;
+  -moz-opacity: 0.8;
+  opacity: 0.8;
+}
+.twipsy.fade.in {
+  filter: alpha(opacity=80);
+  -khtml-opacity: 0.8;
+  -moz-opacity: 0.8;
+  opacity: 0.8;
+}
+.twipsy.above .twipsy-arrow {
+  bottom: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #000000;
+}
+.twipsy.left .twipsy-arrow {
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid #000000;
+}
+.twipsy.below .twipsy-arrow {
+  top: 0;
+  left: 50%;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #000000;
+}
+.twipsy.right .twipsy-arrow {
+  top: 50%;
+  left: 0;
+  margin-top: -5px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 5px solid #000000;
+}
+.twipsy-inner {
+  padding: 3px 8px;
+  background-color: #000000;
+  color: white;
+  text-align: center;
+  max-width: 200px;
+  text-decoration: none;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.twipsy-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
 }
 /* ==|== non-semantic helper classes ========================================
    Please define your styles before this section.

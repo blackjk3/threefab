@@ -38,25 +38,39 @@
 
 <body>
   <div id="toolbox">
-  	<ul class="toolbox-list clearfix">
-		<li><a href="#sphere" class="sphere" title="Sphere"></a></li>
-		<li><a href="#cube" class="cube" title="Cube"></a></li>
-		<li><a href="#cylinder" class="cylinder" title="Cylinder"></a></li>
-		<li><a href="#cone" class="cone" title="Cone"></a></li>
-		<li><a href="#plane" class="plane" title="Plane"></a></li>
-		<li><a href="#torus" class="torus" title="Torus"></a></li>
-	</ul>
-	<ul class="light-list clearfix">
-  		<li><a href="#point" class="point" title="Point"></a></li>
-  		<li><a href="#spot" class="spot" title="Spot"></a></li>
-  		<li><a href="#ambient" class="ambient" title="Ambient"></a></li>
-  		<li><a href="#directional" class="directional" title="Directional"></a></li>
-  		<li></li>
-  	</ul>
+    <div id="logo"></div>
+    
+
+    <div class="righttools clearfix">
+      
+      <ul class="light-list clearfix">
+        <li><a href="#point" class="point" data-placement="below" rel='twipsy' title="Point"></a></li>
+        <li><a href="#spot" class="spot" data-placement="below" rel='twipsy' title="Spot"></a></li>
+        <li><a href="#ambient" class="ambient" data-placement="below" rel='twipsy' title="Ambient"></a></li>
+        <!-- <li><a href="#directional" class="directional" title="Directional"></a></li> -->
+        <li></li>
+      </ul>
+      <ul class="toolbox-list clearfix">
+    		<li><a href="#sphere" class="sphere" title="Sphere"></a></li>
+    		<li><a href="#cube" class="cube" title="Cube"></a></li>
+    		<li><a href="#cylinder" class="cylinder" title="Cylinder"></a></li>
+    		<li><a href="#cone" class="cone" title="Cone"></a></li>
+    		<li><a href="#plane" class="plane" title="Plane"></a></li>
+    		<li><a href="#torus" class="torus" title="Torus"></a></li>
+    	</ul>
+    	<ul class="export-list">
+        <li><button class="export button">Export</button>
+      </ul>
+      
+  </div>
   </div>
   <div id="gui-transform-container"></div>
   <div id="gui-materials-container">
   	<div></div>
+  </div>
+  <div class="code-container">
+    <button id="hide-button" class="button fr">Hide</button>
+    <pre></pre>
   </div>
   <!-- JavaScript at the bottom for fast page loading -->
 
@@ -67,7 +81,8 @@
   
   <script src="js/libs/underscore.js"></script>
   <script src="js/libs/backbone.js"></script>
-  
+  <script src="js/libs/bootstrap-twipsy.js"></script>
+
   <script src="js/mylibs/dat.gui.js"></script>
   <script src="js/mylibs/Three.js"></script>
   <script src="js/mylibs/RequestAnimationFrame.js"></script>

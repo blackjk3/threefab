@@ -8,7 +8,8 @@
  
 THREEFAB.Exporter = function() {
 
-	THREEFAB.Exporter.Templates.material = $(THREEFAB.Exporter.Templates.material);
+	//THREEFAB.Exporter.Templates.material = $(THREEFAB.Exporter.Templates.material);
+	var code_container = $('.code-container');
 	
 	this.generate = function(viewport) {
 		
@@ -19,9 +20,12 @@ THREEFAB.Exporter = function() {
 			html += THREEFAB.Exporter.Utils.renderer();
 			
 			html += THREEFAB.Exporter.Utils.sceneObjects(viewport.scene);
+
+			html += THREEFAB.Exporter.Utils.animate();
 			
 		
-		$(document.body).append('<div class="code-container"><pre>' + html + '</pre></div>');
+		code_container.find('pre').html( html );
+		code_container.show();
 	};
 };
 
@@ -33,7 +37,7 @@ THREEFAB.Exporter.Templates = {
 THREEFAB.Exporter.Utils = {
 
 	privates: function() {
-		return "var container = document.createElement( 'div' ),\nwidth = window.innerWidth,\nheight = window.innerHeight,\ncamera,\nscene,\nrenderer,\nSHADOW_MAP_WIDTH = 2048,\nSHADOW_MAP_HEIGHT = 1024;\n\n";
+		return "var container = document.createElement( 'div' ),\nwidth = " + window.innerWidth + ",\nheight = " + window.innerHeight + ",\ncamera,\nscene,\nrenderer,\nSHADOW_MAP_WIDTH = 2048,\nSHADOW_MAP_HEIGHT = 1024;\n\n";
 	},
 
 	container: function() {
@@ -46,11 +50,13 @@ THREEFAB.Exporter.Utils = {
 	
 	camera: function (cam) {
 	
-		var str = ["camera = new THREE.CombinedCamera( width/2, height/2, 70, 1, 5000, -1000, 1000, 1000 );"];
+		var str = ["camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );"];
 
-		str.push('camera.position.x = ' + cam.position.x + ';');
-		str.push('camera.position.y = ' + cam.position.y + ';');
-		str.push('camera.position.z = ' + cam.position.z + ';');
+		str.push('camera.position.set(' + cam.position.x + ',' + cam.position.y + ',' + cam.position.z + ');');
+		str.push('camera.rotation.set(' + cam.rotation.x + ',' + cam.rotation.y + ',' + cam.rotation.z + ');');
+
+		str.push('camera.aspect = width / height;');
+		str.push('camera.updateProjectionMatrix();');
 
 		return str.join('\n');
 	},
@@ -65,7 +71,7 @@ THREEFAB.Exporter.Utils = {
 
 		str.push('renderer.setSize( width, height );');
 		str.push('renderer.shadowCameraNear = 3;');
-		str.push('renderer.shadowCameraFar = this.camera.far');
+		str.push('renderer.shadowCameraFar = this.camera.far;');
 		str.push('renderer.shadowCameraFov = 50;');
 		str.push('renderer.shadowMapBias = 0.0039;');
 		str.push('renderer.shadowMapDarkness = 0.5;');
@@ -83,40 +89,58 @@ THREEFAB.Exporter.Utils = {
 
 		var children = scene.children,
 			name_split,
-			str = [];
+			str = [],
+			materialModel = new THREEFAB.MaterialModel();
 
 		for(var i=0, len = children.length; i < len; i++) {
 		
 			
 			if(children[i].name) {
 				
-				if(children[i].light) {
+				if( children[i].name === 'THREE.PointLight' || children[i].name === 'THREE.AmbientLight' || children[i].name === 'THREE.SpotLight' ) {
 					// Light
-					console.log(children[i].name);
-				} else {
+					console.log("EXPORT LIGHT ");
+					str.push( THREEFAB.Exporter.Utils.light(children[i], materialModel.lightList) );
+					THREEFAB.Exporter.Utils.transforms(children[i], str);
+					// Add light
+					str.push('scene.add( mesh );');
+
+				} else if( !children[i].light ) {
+
 					// Mesh
-					console.log(children[i].name);
 					name_split = children[i].name.split('.');
 
 					var namespace = name_split[0],
 						meshtype = name_split[1],
 						id = name_split[2];
 					
+					// Check for primitive geometry
 					if(meshtype === "CubeGeometry") {
-						str.push(THREEFAB.Exporter.Utils.geometries.cube(children[i]));
-						console.log(children[i]);
+						str.push( THREEFAB.Exporter.Utils.geometries.cube(children[i]) );
+					} else if(meshtype === "SphereGeometry") {
+						str.push( THREEFAB.Exporter.Utils.geometries.sphere(children[i]) );
+					} else if(meshtype === "CylinderGeometry") {
+						str.push( THREEFAB.Exporter.Utils.geometries.cylinder(children[i]) );
+					} else if(meshtype === "ConeGeometry") {
+						str.push( THREEFAB.Exporter.Utils.geometries.cone(children[i]) );
+					} else if(meshtype === "PlaneGeometry") {
+						str.push( THREEFAB.Exporter.Utils.geometries.plane(children[i]) );
+					} else if(meshtype === "TorusGeometry") {
+						str.push( THREEFAB.Exporter.Utils.geometries.torus(children[i]) );
 					}
 
-					//str.push( THREEFAB.Exporter.Utils.material(children[i]) );
-					THREEFAB.Exporter.Utils.material(children[i].material);
+					// Material
+					console.log("EXPORT obj ");
+					console.log(children[i]);
+					str.push( THREEFAB.Exporter.Utils.material(children[i].material, materialModel.materialList) );
 
-
+					// Mesh
 					str.push('var mesh = new THREE.Mesh(geometry, material);');
 					THREEFAB.Exporter.Utils.transforms(children[i], str);
-					
-
+					// Add child
 					str.push('scene.add( mesh );');
 				}
+
 			}
 
 		}
@@ -124,34 +148,102 @@ THREEFAB.Exporter.Utils = {
 		return str.join('\n');
 	},
 
-	material: function(material) {
+	light: function(light, lightList) {
+
+		var type = light.name.replace('THREE.',''),
+			lght = new THREE[type](),
+			html = '\nvar mesh = new ' + light.name + '();\n';
+
+		for(var i = 0, len = lightList.length; i < len; i++) {
+			if(lght[lightList[i]] !== lightList[i].prop) {
+				html += 'mesh.' + lightList[i].prop + ' = ' + light[lightList[i].prop] + ';\n';
+			}
+		}
+
+		// Add light color
+		html+= 'mesh.color = new THREE.Color().setRGB(' + light.color.r + ',' + light.color.g + ',' + light.color.b + ');';
+
+		return html;
+	},
+
+	material: function(material, materialList) {
 		
-		//var 'var material = new ' + ;
-		console.log(material);
-		var html = THREEFAB.Exporter.Templates.material.tmpl(material);
-		console.log(html);
-		//return ;
+		var mat = new THREE[material.name](),
+			html = 'var material = new THREE.' + material.name + '();\n';
+
+		for(var i = 0, len = materialList.length; i < len; i++) {
+
+			// Make sure material has at least changed from the default.
+			if(material[materialList[i].prop] !== undefined && material[materialList[i].prop] !== mat[materialList[i].prop]) {
+				html+= 'material.' + materialList[i].prop + ' = ' + material[materialList[i].prop] + ';\n';
+			}
+
+		}
+
+		// Colors
+		// Do colors manually since they are currently not in the material list.
+		var color_props = ['color', 'ambient', 'specular'];
+		
+		for(var j = 0, clen = color_props.length; j < clen; j++) {
+			if(mat[color_props[j]] !== material[color_props[j]]) {
+				html+= 'material.' + color_props[j] + ' = new THREE.Color().setRGB(' + material[color_props[j]].r+','+material[color_props[j]].g+','+material[color_props[j]].b+');\n';
+			}
+		}
+
+		return html;
 	},
 
 	geometries: {
 		cube: function(mesh) {
 			return 'var geometry = new THREE.CubeGeometry( 100,100,100,1,1,1 );';
+		},
+		sphere: function(mesh) {
+			return 'var geometry = new THREE.SphereGeometry(100,16,16);';
+		},
+		cylinder: function(mesh) {
+			return 'var geometry = new THREE.CylinderGeometry(50, 50, 100, 16);';
+		},
+		cone: function(mesh) {
+			return 'var geometry = new THREE.CylinderGeometry( 0, 50, 100, 16, 1 );';
+		},
+		plane: function(mesh) {
+			return 'var geometry = new THREE.PlaneGeometry( 200, 200, 3, 3 );';
+		},
+		torus: function(mesh) {
+			return 'var geometry = new THREE.TorusGeometry();';
 		}
 	},
 
 	transforms: function(child, str) {
-	
-		if ( child.position.x !== 0 ) str.push('mesh.position.x = ' + child.position.x + ';');
-		if ( child.position.y !== 0 ) str.push('mesh.position.y = ' + child.position.y + ';');
-		if ( child.position.z !== 0 ) str.push('mesh.position.z = ' + child.position.z + ';');
 
-		if ( child.rotation.x !== 0 ) str.push('mesh.rotation.x = ' + child.rotation.x + ';');
-		if ( child.rotation.y !== 0 ) str.push('mesh.rotation.y = ' + child.rotation.y + ';');
-		if ( child.rotation.z !== 0 ) str.push('mesh.rotation.z = ' + child.rotation.z + ';');
+		var pos = { x:0, y:0, z:0 },
+			rot = { x:0, y:0, z:0 },
+			scale = { x:1, y:1, z:1 };
+		
+		if ( child.position.x !== 0 ) pos.x = child.position.x;
+		if ( child.position.y !== 0 ) pos.y = child.position.y;
+		if ( child.position.z !== 0 ) pos.z = child.position.z;
 
-		if ( child.scale.x != 1 ) str.push('mesh.scale.x = ' + child.scale.x + ';');
-		if ( child.scale.y != 1 ) str.push('mesh.scale.y = ' + child.scale.y + ';');
-		if ( child.scale.z != 1 ) str.push('mesh.scale.z = ' + child.scale.z + ';');
+		if ( child.rotation.x !== 0 ) rot.x = child.rotation.x;
+		if ( child.rotation.y !== 0 ) rot.y = child.rotation.y;
+		if ( child.rotation.z !== 0 ) rot.z = child.rotation.z;
+
+		if ( child.scale.x != 1 ) scale.x = child.scale.x;
+		if ( child.scale.y != 1 ) scale.y = child.scale.y;
+		if ( child.scale.z != 1 ) scale.z = child.scale.z;
+
+		str.push('mesh.position.set(' + pos.x + ',' + pos.y + ',' + pos.z + ');');
+		str.push('mesh.rotation.set(' + rot.x + ',' + rot.y + ',' + rot.z + ');');
+		str.push('mesh.scale.set(' + scale.x + ',' + scale.y + ',' + scale.z + ');');
+	},
+
+	animate: function() {
+		var html = '\n\nfunction animate() {\n';
+			html += '\trequestAnimationFrame( animate );\n';
+			html += '\trenderer.render( scene, camera );\n';
+			html += '}\n\n';
+			html += 'animate();';
+		return html;
 	}
 };
 

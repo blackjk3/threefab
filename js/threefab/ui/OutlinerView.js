@@ -56,7 +56,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 		
 		for(var i=0, len = children.length; i < len; i++) {
 		
-			if(children[i].name) {
+			if(children[i].name && children[i].name !== 'THREE.PointLight' && children[i].name !== 'THREE.SpotLight' && children[i].name !== 'THREE.AmbientLight') {
 
 				opt = document.createElement('option');
 				opt.innerHTML = children[i].name;
