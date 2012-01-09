@@ -315,7 +315,7 @@ THREEFAB.Viewport.prototype = {
 			doubleSided = false;
 		
 		
-		material = new THREE.MeshPhongMaterial( { wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.SmoothShading, overdraw:false } );
+		material = new THREE.MeshPhongMaterial( { wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.SmoothShading, overdraw: false } );
 		material.name = 'MeshPhongMaterial';
 				
 		if(type === "sphere") {
@@ -388,7 +388,7 @@ THREEFAB.Viewport.prototype = {
 		this.scene.add(particleSystem);
 	},
 	
-	addModel:function(mesh) {
+	addModel: function(mesh) {
 		this.scene.add(mesh);
 		this.selected(mesh);
 		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
@@ -396,7 +396,7 @@ THREEFAB.Viewport.prototype = {
 		return mesh;
 	},
 	
-	addLight:function(type) {
+	addLight: function(type) {
 		
 		var lightmesh;
 		
