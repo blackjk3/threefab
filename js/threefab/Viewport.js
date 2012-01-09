@@ -32,12 +32,6 @@ THREEFAB.Viewport = function( parameters ) {
 		
 	// Add basic scene container
 	document.body.appendChild( _container );
-	
-	// Setup camera, scene.
-	//this.camera = new THREE.CombinedCamera( _width/2, _height/2, 70, 1, 5000, -1000, 1000, 1000 );
-	//this.camera.position.x = 300;
-	//this.camera.position.y = 150;
-	//this.camera.position.z = 300;
 
 	this.camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	this.camera.position.x = 500;
@@ -421,9 +415,8 @@ THREEFAB.Viewport.prototype = {
 	addTexture: function(tex) {
 		
 		this._SELECTED.material.program = null;
-		this._SELECTED.material.map = tex;
-
 		this._SELECTED.material.program = null;
+
 		this._SELECTED.material.map = tex;
 
 		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);

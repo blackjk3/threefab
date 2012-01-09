@@ -135,7 +135,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 	},
 
 	changeLightColor: function(c) {
-		console.log(this.selected);
+		
 		this.selected.light.color = new THREE.Color().setRGB(c.r/255, c.g/255, c.b/255);
 	},
 	

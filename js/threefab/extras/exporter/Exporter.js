@@ -8,7 +8,6 @@
  
 THREEFAB.Exporter = function() {
 
-	//THREEFAB.Exporter.Templates.material = $(THREEFAB.Exporter.Templates.material);
 	var code_container = $('.code-container');
 	
 	this.generate = function(viewport) {
@@ -93,23 +92,21 @@ THREEFAB.Exporter.Utils = {
 			materialModel = new THREEFAB.MaterialModel(),
 			loaderUsed = false;
 
-		console.log(children);
-
 		for(var i=0, len = children.length; i < len; i++) {
 		
 			
 			if(children[i].name) {
 				
 				if( children[i].name === 'THREE.PointLight' || children[i].name === 'THREE.AmbientLight' || children[i].name === 'THREE.SpotLight' ) {
+					
 					// Light
-					console.log("EXPORT LIGHT ");
 					str.push( THREEFAB.Exporter.Utils.light(children[i], materialModel.lightList) );
 					THREEFAB.Exporter.Utils.transforms(children[i], str);
 					// Add light
 					str.push('scene.add( mesh );');
 
 				} else if( !children[i].light ) {
-					console.log(children[i]);
+					
 					// Mesh
 					name_split = children[i].name.split('.');
 
@@ -139,8 +136,6 @@ THREEFAB.Exporter.Utils = {
 					}
 
 					// Material
-					console.log("EXPORT obj ");
-					console.log(children[i]);
 					str.push( THREEFAB.Exporter.Utils.material(children[i].material, materialModel.materialList) );
 
 					// Mesh

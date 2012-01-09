@@ -52,12 +52,6 @@ THREEFAB.Ui.utils = {
 				if(list[i].step !== undefined) {
 					tmp_controller.step(list[i].step);
 				}
-				
-				/*if(list[i].onChange !== undefined) {
-					
-					tmp_controller.onChange(view[list[i].onChange].apply(view, [undefined]));
-					console.log("Setup :: Changing Property :: ");
-				}*/
 			}
 		
 		}

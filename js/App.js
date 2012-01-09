@@ -19,7 +19,6 @@
 		// App Resize
 		window.addEventListener('resize', function(event) {
 			viewport.setSize( window.innerWidth, window.innerHeight );
-			exporter.generate(viewport);
 		}, false);
 		
 		
