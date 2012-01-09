@@ -90,7 +90,10 @@ THREEFAB.Exporter.Utils = {
 		var children = scene.children,
 			name_split,
 			str = [],
-			materialModel = new THREEFAB.MaterialModel();
+			materialModel = new THREEFAB.MaterialModel(),
+			loaderUsed = false;
+
+		console.log(children);
 
 		for(var i=0, len = children.length; i < len; i++) {
 		
@@ -106,7 +109,7 @@ THREEFAB.Exporter.Utils = {
 					str.push('scene.add( mesh );');
 
 				} else if( !children[i].light ) {
-
+					console.log(children[i]);
 					// Mesh
 					name_split = children[i].name.split('.');
 
@@ -127,6 +130,12 @@ THREEFAB.Exporter.Utils = {
 						str.push( THREEFAB.Exporter.Utils.geometries.plane(children[i]) );
 					} else if(meshtype === "TorusGeometry") {
 						str.push( THREEFAB.Exporter.Utils.geometries.torus(children[i]) );
+					} else if(meshtype === "JSONLoader") {
+						if(!loaderUsed) {
+							str.push('\nvar loader = new THREE.JSONLoader();');
+						}
+						
+						str.push('loader.load( "path/to/model.js", function(geometry) {');
 					}
 
 					// Material
@@ -139,6 +148,10 @@ THREEFAB.Exporter.Utils = {
 					THREEFAB.Exporter.Utils.transforms(children[i], str);
 					// Add child
 					str.push('scene.add( mesh );');
+
+					if(meshtype === "JSONLoader") {
+						str.push('});');
+					}
 				}
 
 			}
@@ -188,6 +201,10 @@ THREEFAB.Exporter.Utils = {
 			if(mat[color_props[j]] !== material[color_props[j]]) {
 				html+= 'material.' + color_props[j] + ' = new THREE.Color().setRGB(' + material[color_props[j]].r+','+material[color_props[j]].g+','+material[color_props[j]].b+');\n';
 			}
+		}
+
+		if(material.map instanceof THREEFAB.CanvasTexture) {} else {
+			html += 'material.map = THREE.ImageUtils.loadTexture("path/to/texture.jpg");\n';
 		}
 
 		return html;

@@ -410,8 +410,6 @@ THREEFAB.Viewport.prototype = {
 		
 		lightmesh.mesh.position.y = 150;
 		lightmesh.mesh.position.x = 100;
-
-		console.log(lightmesh.mesh.light);
 		
 		this.resetMaterials();
 

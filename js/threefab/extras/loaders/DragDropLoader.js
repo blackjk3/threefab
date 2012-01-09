@@ -44,6 +44,7 @@ THREEFAB.DragDropLoader = function() {
 					material.name = 'MeshPhongMaterial';
 					
 					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = "THREE.JSONLoader." + mesh.id;
 					
 					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
