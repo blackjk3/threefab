@@ -34,3 +34,8 @@ To add a texture first select a model and drag and drop the image on to the view
 Exporter
 -------------
 To generate and export the current three.js code click the generate button in the top right.  Note: You will need to update the paths for any textured materials and JSON models.  Threefab will put a placeholer url that will need to be modified.
+
+Screenshots
+=============
+![Screenshot](http://blackjk3.github.com/threefab/assets/screenie0.jpg)
+![Screenshot 2](http://blackjk3.github.com/threefab/assets/screenie1.jpg)
