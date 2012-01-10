@@ -7,13 +7,20 @@ For those not familiar with [Three.js][1]
 
 [1]: https://github.com/mrdoob/three.js
 
+[TRY IT OUT][2]
+[2]: http://blackjk3.github.com/threefab/
+
 Controls
 =============
 
 Key controls
 -------------
-S - Zoom in and out on scene
-X - Delete selected object
+* S - Zoom in and out on scene
+* X - Delete selected object
+
+Viewport
+-------------
+To move the camera click and drag anywhere in the viewport.  
 
 Positioning objects
 -------------
@@ -21,7 +28,7 @@ To position an object you can use the manipulator tool or use the individual pos
 
 Transforms
 -------------
-The transforms are setup in blocks of three coordinates (x,y,z).  The first block is for position, second is for rotation, third is for scale.
+The transforms are setup in blocks of three coordinates (x,y,z).  The first block is for position, second is for rotation, third is for scale.  Note: Rotation is currently in radians. 
 
 Outliner
 -------------
