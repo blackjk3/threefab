@@ -90,6 +90,10 @@ THREEFAB.Viewport = function( parameters ) {
 	$.subscribe(THREEFAB.Events.TEXTURE_CLEAR, $.proxy(this.clearTexture, this));
 
 	$.subscribe(THREEFAB.Events.OUTLINER_CHANGED, outlinerChanged);
+<<<<<<< HEAD
+=======
+	$.subscribe(THREEFAB.Events.VIEWPORT_TARGET_CENTER, targetCenter);
+>>>>>>> gh-pages
 
 	// =============================================================================
 	// DEFAULT Light, Cube.  JUST LIKE BLENDER
@@ -121,6 +125,12 @@ THREEFAB.Viewport = function( parameters ) {
 		//_this.camera.toPerspective();
 		_this.camera.updateProjectionMatrix();
 
+<<<<<<< HEAD
+=======
+		_this.controls.screen.width = width;
+		_this.controls.screen.height = height;
+
+>>>>>>> gh-pages
 		_this.renderer.setSize( width, height );
 		_this.render();
 
@@ -167,6 +177,13 @@ THREEFAB.Viewport = function( parameters ) {
 		var child = _this.scene.getChildByName(name);
 		_this.selected(child);
 	}
+<<<<<<< HEAD
+=======
+
+	function targetCenter() {
+		_this.controls.target = new THREE.Vector3();
+	}
+>>>>>>> gh-pages
 	
 	
 	// =============================================================================
@@ -257,6 +274,21 @@ THREEFAB.Viewport = function( parameters ) {
 			}
 		}
 	});
+<<<<<<< HEAD
+=======
+
+	this.renderer.domElement.addEventListener( 'dblclick', function (e) {
+		
+		_this._SELECTED.geometry.computeBoundingBox();
+
+		var bb = _this._SELECTED.geometry.boundingBox;
+
+		_this.camera.position.x = _this._SELECTED.position.x;
+		_this.camera.position.y = _this._SELECTED.position.y + _this._SELECTED.boundRadius;
+		_this.camera.position.z = _this._SELECTED.position.z + (bb.z[1]+300);
+		_this.controls.target = _this._SELECTED.position;
+	});
+>>>>>>> gh-pages
 	
 	// ----------------------------------------
 	// Keyboard Support
@@ -413,6 +445,7 @@ THREEFAB.Viewport.prototype = {
 	},
 	
 	addTexture: function(tex) {
+<<<<<<< HEAD
 		
 		this._SELECTED.material.program = null;
 		this._SELECTED.material.program = null;
@@ -420,6 +453,16 @@ THREEFAB.Viewport.prototype = {
 		this._SELECTED.material.map = tex;
 
 		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);
+=======
+		if(!this._SELECTED.light) {
+			this._SELECTED.material.program = null;
+			this._SELECTED.material.program = null;
+
+			this._SELECTED.material.map = tex;
+
+			$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);
+		}
+>>>>>>> gh-pages
 	},
 
 	clearTexture: function() {

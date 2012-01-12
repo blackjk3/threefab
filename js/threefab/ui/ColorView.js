@@ -41,6 +41,7 @@ THREEFAB.ColorView = Backbone.View.extend({
 	},
 
 	meshChanged: function( object ) {
+<<<<<<< HEAD
 		
 		var color = { r: object.material.color.r*255, g:object.material.color.g*255, b:object.material.color.b*255 },
 			ambient = { r: object.material.ambient.r*255, g:object.material.ambient.g*255, b:object.material.ambient.b*255 },
@@ -49,6 +50,17 @@ THREEFAB.ColorView = Backbone.View.extend({
 		this.update( this.types.color, color );
 		this.update( this.types.ambient, ambient );
 		this.update( this.types.specular, specular );
+=======
+		if(object.material) {
+			var color = { r: object.material.color.r*255, g:object.material.color.g*255, b:object.material.color.b*255 },
+				ambient = { r: object.material.ambient.r*255, g:object.material.ambient.g*255, b:object.material.ambient.b*255 },
+				specular = { r: object.material.specular.r*255, g:object.material.specular.g*255, b:object.material.specular.b*255 };
+
+			this.update( this.types.color, color );
+			this.update( this.types.ambient, ambient );
+			this.update( this.types.specular, specular );
+		}
+>>>>>>> gh-pages
 	},
 
 	changeColor: function( hsb, hex, rgb ) {
