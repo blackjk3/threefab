@@ -59,14 +59,9 @@ THREEFAB.DragDropLoader = function() {
 				var texture = new THREE.Texture(img);
 				texture.needsUpdate = true;
 				
-<<<<<<< HEAD
-				$.publish(THREEFAB.Events.TEXTURE_LOADED, texture);
-			
-=======
 				img.onload = function() {
 					$.publish(THREEFAB.Events.TEXTURE_LOADED, texture);
 				};
->>>>>>> gh-pages
 			}
 			
 		};

@@ -16,10 +16,7 @@ Controls
 Key controls
 -------------
 * S - Zoom in and out on scene
-<<<<<<< HEAD
-=======
 * D - Pan around scene
->>>>>>> gh-pages
 * X - Delete selected object
 
 Viewport

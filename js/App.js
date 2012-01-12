@@ -27,11 +27,7 @@
 		viewport.setSize( window.innerWidth, window.innerHeight );
 
 		//exporter.generate(viewport);
-<<<<<<< HEAD
-		$.subscribe(THREEFAB.Events.EXPORTER_GENERATE, function(){
-=======
 		$.subscribe(THREEFAB.Events.EXPORTER_GENERATE, function() {
->>>>>>> gh-pages
 			exporter.generate(viewport);
 		});
 

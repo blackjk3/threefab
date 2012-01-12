@@ -13,19 +13,13 @@ THREEFAB.TransformView = Backbone.View.extend({
 	gui: {},
 	outliner: {},
 	viewport: {},
-<<<<<<< HEAD
-=======
 	viewportView: {},
->>>>>>> gh-pages
 	selected: {},
 	
 	folders: {
 		camera:{},
 		outliner:{},
-<<<<<<< HEAD
-=======
 		viewport:{},
->>>>>>> gh-pages
 		transforms:{}
 	},
 	
@@ -52,15 +46,12 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.folders.camera = this.gui.addFolder('Camera')	;
 		this.addCameraOptions();
 
-<<<<<<< HEAD
-=======
 		// Add target
 		this.folders.viewport = this.gui.addFolder('Controls');
 		this.viewportView = new THREEFAB.ViewportView();
 		this.folders.viewport.__ul.appendChild(this.viewportView.el[0]);
 		this.folders.viewport.open();
 
->>>>>>> gh-pages
 		// Add outliner
 		this.folders.outliner = this.gui.addFolder('Outliner');
 		this.outliner = new THREEFAB.OutlinerView();
@@ -81,11 +72,7 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.folders.camera.add(this.viewport.camera.position, 'x').listen();
 		this.folders.camera.add(this.viewport.camera.position, 'y').listen();
 		this.folders.camera.add(this.viewport.camera.position, 'z').listen();
-<<<<<<< HEAD
-
-=======
 		
->>>>>>> gh-pages
 	},
 
 	addTransformOptions: function() {
