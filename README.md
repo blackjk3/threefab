@@ -23,6 +23,10 @@ Viewport
 -------------
 To move the camera click and drag anywhere in the viewport.  
 
+Targeting objects
+-------------
+Double click a mesh object to target.  The viewport controls will then rotate according to the registration point of the targeted object.  Clicking the "center" button in the "Controls" panel will re-target the viewport controls to the center of the scene.
+
 Positioning objects
 -------------
 To position an object you can use the manipulator tool or use the individual position attributes in the transforms panel.
