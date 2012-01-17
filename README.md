@@ -13,11 +13,12 @@ For those not familiar with [Three.js][1]
 Controls
 =============
 
-Key controls
+Keyboard controls
 -------------
-* S - Zoom in and out on scene
+* S - Zoom in and out on scene (Zoom also works with mouse wheel)
 * D - Pan around scene
 * X - Delete selected object
+* SPACEBAR - Start stop animation preview
 
 Viewport
 -------------
@@ -46,6 +47,10 @@ To add a texture first select a model and drag and drop the image on to the view
 Exporter
 -------------
 To generate and export the current three.js code click the generate button in the top right.  Note: You will need to update the paths for any textured materials and JSON models.  Threefab will put a placeholer url that will need to be modified.
+
+Animation
+-------------
+To preview an animation the model must have morph targets set up.  The animation timeline will then allow you to play, pause, and scrub through the keyframes.  For details see the animated models that come with three.js.  (Horse, Parrot, Flamingo, Stork)
 
 Screenshots
 =============

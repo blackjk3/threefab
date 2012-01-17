@@ -57,7 +57,7 @@ THREEFAB.Viewport = function( parameters ) {
 	_container.appendChild( this.renderer.domElement );
 	
 	// Add trackball this.controls.
-	this.controls = new THREE.TrackballControls( this.camera, this.renderer.domElement );
+	this.controls = new THREE.ViewportControls( this.camera, this.renderer.domElement );
 	this.controls.rotateSpeed = 1.0;
 	this.controls.zoomSpeed = 1.2;
 	this.controls.panSpeed = 0.2;
@@ -92,11 +92,22 @@ THREEFAB.Viewport = function( parameters ) {
 	$.subscribe(THREEFAB.Events.OUTLINER_CHANGED, outlinerChanged);
 	$.subscribe(THREEFAB.Events.VIEWPORT_TARGET_CENTER, targetCenter);
 
+	$.subscribe(THREEFAB.Events.TIMELINE_CHANGED, updateMeshFrame);
+	$.subscribe(THREEFAB.Events.TIMELINE_PLAY, playAnimation);
+	$.subscribe(THREEFAB.Events.TIMELINE_PAUSE, pauseAnimation);
+
 	// =============================================================================
 	// DEFAULT Light, Cube.  JUST LIKE BLENDER
 	// =============================================================================
 	
 	this.setupDefaultScene.apply(this);
+
+	this.keyframe = 0;
+	this.keyframes = 0;
+	this.animating = false;
+	this.duration = 1000;
+	this.interpolation = this.duration / this.keyframes;
+	
 	//this.addParticleSystem.apply(this);
 	
 	// =============================================================================
@@ -105,6 +116,11 @@ THREEFAB.Viewport = function( parameters ) {
 	
 	this.render = function() {
 		_this.controls.update();
+
+		if(this.animating) {
+			this.processAnimation();
+		}
+
 		_this.renderer.render( _this.scene, _this.camera );
 	};
 	
@@ -132,6 +148,9 @@ THREEFAB.Viewport = function( parameters ) {
 	
 	this.selected = function(object) {
 		
+		// Pause any animations taking place
+		pauseAnimation();
+
 		// Remove the current overdraw
 		if(_this._SELECTED) {
 			_this._SELECTED.material.program = null;
@@ -142,7 +161,7 @@ THREEFAB.Viewport = function( parameters ) {
 		
 		if(!_this._SELECTED.light) {
 			// It's a mesh!
-			$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, object);
+			this.selectMesh(object);
 		} else {
 			// It's a light!
 			$.publish(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, object);
@@ -150,6 +169,7 @@ THREEFAB.Viewport = function( parameters ) {
 			_this._SELECTED.material.overdraw = true;
 		}
 
+		_this.keyframe = 0;
 		_this.updateManipulator();
 	};
 	
@@ -160,11 +180,37 @@ THREEFAB.Viewport = function( parameters ) {
 		_SELECTED_DOWN = false;
 		
 	};
+
+	this.processAnimation = function() {
+		var time = Date.now() % this.duration;
+		var frame = Math.floor( time / _this.interpolation ) + 1;
+
+		if ( frame !== _this.keyframe ) {
+
+			_this._SELECTED.morphTargetInfluences[ _this.keyframe ] = 0;
+			_this._SELECTED.morphTargetInfluences[ frame ] = 1;
+		}
+
+		_this.keyframe = frame;
+
+		$.publish(THREEFAB.Events.VIEWPORT_KEYFRAME_CHANGED, frame);
+	};
 	
 	this.updateManipulator = function() {
 		_this.manipulator.position.copy( _this._SELECTED.position );
 	};
 
+	this.selectMesh = function (object) {
+
+		$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, object);
+			
+		if(object.morphTargetInfluences) {
+			if(object.morphTargetInfluences.length > 0) {
+				_this.keyframes = object.morphTargetInfluences.length;
+				_this.interpolation = _this.duration / _this.keyframes;
+			}
+		}
+	};
 
 	function outlinerChanged(name) {
 		
@@ -175,7 +221,34 @@ THREEFAB.Viewport = function( parameters ) {
 	function targetCenter() {
 		_this.controls.target = new THREE.Vector3();
 	}
+
+	function updateMeshFrame(frame) {
+		if( meshCanAnimate() ) {
+			_this._SELECTED.morphTargetInfluences[ _this.keyframe ] = 0;
+			_this._SELECTED.morphTargetInfluences[ frame ] = 1;
+			_this.keyframe = frame;
+		}
+	}
+
+	function playAnimation() {
+		if( meshCanAnimate() ) {
+			_this.animating = true;
+		}
+	}
+
+	function pauseAnimation() {
+		_this.animating = false;
+	}
 	
+
+	function meshCanAnimate() {
+
+		if(_this._SELECTED.morphTargetInfluences) {
+			return true;
+		}
+
+		return false;
+	}
 	
 	// =============================================================================
 	//
@@ -293,6 +366,7 @@ THREEFAB.Viewport = function( parameters ) {
 			code = e.which;
 		}
 		
+		// IF it is X then delete whatever object is selected.
 		if (code === 88) {
 			if(_this._SELECTED) {
 				
@@ -313,6 +387,9 @@ THREEFAB.Viewport = function( parameters ) {
 
 				$.publish(THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, _this.scene);
 			}
+		} else if(code === 32) {
+			// Spacebar
+			$.publish(THREEFAB.Events.SPACEBAR_PRESSED);
 		}
 	});
 };
@@ -407,6 +484,8 @@ THREEFAB.Viewport.prototype = {
 		this.selected(mesh);
 		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
 		
+		this.selectMesh(mesh);
+
 		return mesh;
 	},
 	

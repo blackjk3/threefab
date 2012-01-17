@@ -14,10 +14,11 @@ THREEFAB.Ui = function(viewport) {
 		
 	this.materialView = new THREEFAB.MaterialView({ model: materialModel, selected: viewport._SELECTED });
 	this.transformView = new THREEFAB.TransformView({ viewport: viewport });
+	this.timelineView = new THREEFAB.TimelineView();
 	
 	this.materialView.render();
 	this.transformView.render();
-	
+	this.timelineView.render();
 };
 
 

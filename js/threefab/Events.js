@@ -11,6 +11,7 @@ THREEFAB.Events = {
 	VIEWPORT_OBJECT_REMOVED: 'viewport/object/removed',
 	VIEWPORT_OBJECT_ADDED: 'viewport/object/added',
 	VIEWPORT_TARGET_CENTER: 'viewport/target/center',
+	VIEWPORT_KEYFRAME_CHANGED: 'viewport/keyframe/changed',
 
 	MATERIAL_COLOR_CHANGED: 'material/color/changed',
 	LIGHT_COLOR_CHANGED: 'light/color/changed',
@@ -24,5 +25,11 @@ THREEFAB.Events = {
 	PRIMITIVE_ADDED: 'primitive/add',
 	LIGHT_ADDED: 'light/add',
 
-	EXPORTER_GENERATE: 'exporter/generate'
+	EXPORTER_GENERATE: 'exporter/generate',
+
+	TIMELINE_CHANGED: 'timeline/changed',
+	TIMELINE_PLAY: 'timeline/play',
+	TIMELINE_PAUSE: 'timeline/pause',
+
+	SPACEBAR_PRESSED: 'keyboard/spacebar/pressed'
 };

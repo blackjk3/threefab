@@ -127,7 +127,7 @@ THREEFAB.Exporter.Utils = {
 						str.push( THREEFAB.Exporter.Utils.geometries.plane(children[i]) );
 					} else if(meshtype === "TorusGeometry") {
 						str.push( THREEFAB.Exporter.Utils.geometries.torus(children[i]) );
-					} else if(meshtype === "JSONLoader") {
+					} else if(meshtype === "JSONLoader" || "SkinnedMesh") {
 						if(!loaderUsed) {
 							str.push('\nvar loader = new THREE.JSONLoader();');
 						}
@@ -138,13 +138,24 @@ THREEFAB.Exporter.Utils = {
 					// Material
 					str.push( THREEFAB.Exporter.Utils.material(children[i].material, materialModel.materialList) );
 
+					if(children[i].geometry.morphTargets.length > 0) {
+						str.push('material.morphTargets = true;');
+					}
+
 					// Mesh
-					str.push('var mesh = new THREE.Mesh(geometry, material);');
+					if(meshtype === "SkinnedMesh") {
+						str.push('var mesh = new THREE.SkinnedMesh(geometry, material);');
+					}
+					else {
+						str.push('var mesh = new THREE.Mesh(geometry, material);');
+					}
+
 					THREEFAB.Exporter.Utils.transforms(children[i], str);
+
 					// Add child
 					str.push('scene.add( mesh );');
 
-					if(meshtype === "JSONLoader") {
+					if(meshtype === "JSONLoader"  || "SkinnedMesh") {
 						str.push('});');
 					}
 				}

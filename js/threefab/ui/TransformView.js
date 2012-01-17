@@ -20,7 +20,8 @@ THREEFAB.TransformView = Backbone.View.extend({
 		camera:{},
 		outliner:{},
 		viewport:{},
-		transforms:{}
+		transforms:{},
+		animate:{}
 	},
 	
 	initialize: function() {

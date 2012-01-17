@@ -12,7 +12,7 @@
        More info: h5bp.com/b/378 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title></title>
+  <title>ThreeFab | Three.js fabrication tool.</title>
   <meta name="description" content="Three.js fabrication tool.">
   <meta name="author" content="Jason Kadrmas">
 
@@ -71,6 +71,14 @@
     <button id="hide-button" class="button fr">Hide</button>
     <pre></pre>
   </div>
+
+  <div id="timeline" class="clearfix">
+    
+    <div class="time-buttons">
+      <button class="back button"><span></span></button><button id="playButton" class="play button"><span></span></button><button class="forward button"><span></span></button>
+    </div>
+    <div class="timeline-container"></div>
+  </div>
   <!-- JavaScript at the bottom for fast page loading -->
 
   <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -84,7 +92,8 @@
   <script src="js/mylibs/dat.gui.js"></script>
   <script src="js/mylibs/Three.js"></script>
   <script src="js/mylibs/RequestAnimationFrame.js"></script>
-  
+
+  <script src="js/threefab/controls/ViewportControls.js"></script>
   <script src="js/threefab/objects/ManipulatorTool.js"></script>
   <script src="js/threefab/objects/Grid.js"></script>
   
@@ -109,6 +118,7 @@
   <script src="js/threefab/ui/ViewportView.js"></script>
 
   <script src="js/threefab/ui/TransformView.js"></script>
+  <script src="js/threefab/ui/TimelineView.js"></script>
 
   <script src="js/threefab/Viewport.js"></script>
   <script src="js/threefab/Ui.js"></script>

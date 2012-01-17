@@ -31,20 +31,36 @@ THREEFAB.DragDropLoader = function() {
 
 		reader.onload = function ( event ) {
 			var contents = event.target.result,
-				loader;
+				loader, mesh;
 			
 			if(extension === "js") {
 				// We dropping in a mesh.
 
 				loader = new THREE.JSONLoader();
 				loader.createModel( JSON.parse(contents), function ( geometry ) {
-
+					console.log(geometry);
 					// This is a valid model.
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture() } );
 					material.name = 'MeshPhongMaterial';
 					
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = "THREE.JSONLoader." + mesh.id;
+
+					// Check for morphing targets and add to material.
+					if(geometry.morphTargets.length > 0) {
+						material.morphTargets = true;
+					}
+
+					if(geometry.skinWeights.length > 0) {
+						
+						// Check for skinned mesh
+						mesh = new THREE.SkinnedMesh( geometry, material );
+						mesh.name = "THREE.SkinnedMesh." + mesh.id;
+					
+					} else {
+
+						// Regular mesh.
+						mesh = new THREE.Mesh( geometry, material );
+						mesh.name = "THREE.JSONLoader." + mesh.id;
+					}
 					
 					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
@@ -67,8 +83,10 @@ THREEFAB.DragDropLoader = function() {
 		};
 		
 		if(extension === 'js') {
+			// JSON model file.
 			reader.readAsText( file );
 		} else if(isImage) {
+			// Read image textures as a data url.
 			reader.readAsDataURL(file);
 		}
 				
