@@ -152,13 +152,11 @@ THREE.ViewportControls = function ( object, domElement ) {
 
 			} else {
 
-				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * this.dynamicDampingFactor;
+				_zoomStart.y += ( _zoomEnd.y - _zoomStart.y ) * _this.dynamicDampingFactor;
 
 			}
 
 		}
-		//console.log("S:" + _zoomStart.x + '-' + _zoomStart.y);
-		//console.log("E:" +_zoomEnd.x  +'-'+ _zoomEnd.y);
 	};
 
 	this.panCamera = function() {
@@ -270,7 +268,7 @@ THREE.ViewportControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function keyup( event ) {
 
@@ -282,7 +280,7 @@ THREE.ViewportControls = function ( object, domElement ) {
 
 		}
 
-	};
+	}
 
 	function mousedown( event ) {
 
@@ -303,7 +301,7 @@ THREE.ViewportControls = function ( object, domElement ) {
 
 				_zoomStart = _zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
 
-			} else if ( !this.noPan ) {
+			} else if ( !_this.noPan ) {
 
 				_panStart = _panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
 
@@ -369,16 +367,17 @@ THREE.ViewportControls = function ( object, domElement ) {
 
 	/* MouseWheel: JQuery plugin */
 	$('body').bind('mousewheel', function(event, delta, deltaX, deltaY) {
+	
+		var speed = delta * 0.75;
 		
-		var speed = delta * 0.01;
-		
-		_state = STATE.ZOOM;
-		
+		_zoomStart = _zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+		_zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+
 		_zoomStart.y += delta;
-		_zoomEnd.y = _zoomStart.y + (delta * _this.mouseWheelSpeed);
-		_this.update();
+		_zoomEnd.y = _zoomStart.y + (speed * _this.mouseWheelSpeed);
 		
-		_state = STATE.NONE;
+		console.log(_zoomStart.y + " : " + _zoomEnd.y);
+		console.log(speed + " : " + _this.mouseWheelSpeed);
 	});
 
 };

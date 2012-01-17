@@ -182,8 +182,8 @@ THREEFAB.Viewport = function( parameters ) {
 	};
 
 	this.processAnimation = function() {
-		var time = Date.now() % this.duration;
-		var frame = Math.floor( time / _this.interpolation ) + 1;
+		var time = Date.now() % _this.duration;
+		var frame = Math.floor( time / _this.interpolation );
 
 		if ( frame !== _this.keyframe ) {
 
@@ -194,6 +194,7 @@ THREEFAB.Viewport = function( parameters ) {
 		_this.keyframe = frame;
 
 		$.publish(THREEFAB.Events.VIEWPORT_KEYFRAME_CHANGED, frame);
+		
 	};
 	
 	this.updateManipulator = function() {
@@ -205,10 +206,13 @@ THREEFAB.Viewport = function( parameters ) {
 		$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, object);
 			
 		if(object.morphTargetInfluences) {
+
 			if(object.morphTargetInfluences.length > 0) {
 				_this.keyframes = object.morphTargetInfluences.length;
 				_this.interpolation = _this.duration / _this.keyframes;
 			}
+			console.log(_this.keyframes);
+			console.log(object);
 		}
 	};
 
@@ -341,13 +345,17 @@ THREEFAB.Viewport = function( parameters ) {
 
 	this.renderer.domElement.addEventListener( 'dblclick', function (e) {
 		
+		_this.animating = false;
 		_this._SELECTED.geometry.computeBoundingBox();
 
 		var bb = _this._SELECTED.geometry.boundingBox;
 
+		console.log(bb);
 		_this.camera.position.x = _this._SELECTED.position.x;
 		_this.camera.position.y = _this._SELECTED.position.y + _this._SELECTED.boundRadius;
-		_this.camera.position.z = _this._SELECTED.position.z + (bb.z[1]+300);
+		if(bb.z) {
+			_this.camera.position.z = _this._SELECTED.position.z + (bb.z[1]+300);
+		}
 		_this.controls.target = _this._SELECTED.position;
 	});
 	
