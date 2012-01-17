@@ -50,7 +50,7 @@ To generate and export the current three.js code click the generate button in th
 
 Animation
 -------------
-To preview an animation the model must have morph targets set up.  The animation timeline will then allow you to play, pause, and scrub through the keyframes.  For details see the animated models that come with three.js.  (Horse, Parrot, Flamingo, Stork)
+To preview an animation the model must have morph targets set up.  The animation timeline will then allow you to play, pause, and scrub through the keyframes.  To test use the animated models that come with three.js.  (Ex. horse.js, parrot.js, flamingo.js, stork.js)
 
 Screenshots
 =============
