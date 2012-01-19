@@ -428,7 +428,7 @@ body {
 }
 
 
-#timeline {
+#bottom-toolbar {
 	background:#444444;
 	width:100%;
 	height:40px;
@@ -486,6 +486,63 @@ body {
 
 	canvas {
 		cursor:pointer;
+	}
+
+	.menu {
+		color:#fff;
+		float:right;
+		margin: 0 10px 0 0;
+		
+		ul { 
+			position:relative;
+			list-style:none;
+			margin:5px 0;
+
+			li {
+				position:relative;
+				cursor:pointer;
+				float:left;
+				padding:7px;
+
+				-moz-border-radius: .2em;
+			    -webkit-border-radius: .2em;
+			    border-radius: .2em;
+			}
+
+			li:hover { background:#2FA1D6; }
+			li:hover ul { display: block;}
+		}
+
+		
+
+		li ul {
+			display: none;
+			position: absolute;
+			right: 10px;
+			width:150px;
+			padding:0 0 5px 0;
+			margin:0;
+			
+			bottom:30px;
+
+			li {
+				background:rgba(0,0,0,0.7);
+				width:150px;
+				margin:0;
+				padding:0;	
+				padding:5px;
+				
+				-moz-border-radius: 0;
+			    -webkit-border-radius: 0;
+			    border-radius: 0;	
+			}
+
+			span {
+				display:block;
+				float:right;
+				padding-right:10px;
+			}
+		}
 	}
 }
 

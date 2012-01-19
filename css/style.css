@@ -504,7 +504,7 @@ body {
 .code-container pre {
   font-size: 12px;
 }
-#timeline {
+#bottom-toolbar {
   background: #444444;
   width: 100%;
   height: 40px;
@@ -513,45 +513,94 @@ body {
   bottom: 0;
   z-index: 2;
 }
-#timeline .time-buttons {
+#bottom-toolbar .time-buttons {
   float: left;
 }
-#timeline .button {
+#bottom-toolbar .button {
   margin: 3px 5px 3px 0;
   padding: 2px;
   height: 35px;
 }
-#timeline .button span {
+#bottom-toolbar .button span {
   display: block;
   width: 30px;
   height: 30px;
   background: url(../img/timeline-controls.png);
 }
-#timeline .play span {
+#bottom-toolbar .play span {
   background-position: 0 0;
 }
-#timeline .pause span {
+#bottom-toolbar .pause span {
   background-position: -30px 0;
 }
-#timeline .back span {
+#bottom-toolbar .back span {
   background-position: -60px 0;
 }
-#timeline .forward span {
+#bottom-toolbar .forward span {
   background-position: -90px 0;
 }
-#timeline .timeline-container {
+#bottom-toolbar .timeline-container {
   float: left;
   margin: 3px 0;
   background: #666;
   width: 400px;
   height: 30px;
 }
-#timeline img {
+#bottom-toolbar img {
   vertical-align: top;
   margin: 7px 0;
 }
-#timeline canvas {
+#bottom-toolbar canvas {
   cursor: pointer;
+}
+#bottom-toolbar .menu {
+  color: #fff;
+  float: right;
+  margin: 0 10px 0 0;
+}
+#bottom-toolbar .menu ul {
+  position: relative;
+  list-style: none;
+  margin: 5px 0;
+}
+#bottom-toolbar .menu ul li {
+  position: relative;
+  cursor: pointer;
+  float: left;
+  padding: 7px;
+  -moz-border-radius: .2em;
+  -webkit-border-radius: .2em;
+  border-radius: .2em;
+}
+#bottom-toolbar .menu ul li:hover {
+  background: #2FA1D6;
+}
+#bottom-toolbar .menu ul li:hover ul {
+  display: block;
+}
+#bottom-toolbar .menu li ul {
+  display: none;
+  position: absolute;
+  right: 10px;
+  width: 150px;
+  padding: 0 0 5px 0;
+  margin: 0;
+  bottom: 30px;
+}
+#bottom-toolbar .menu li ul li {
+  background: rgba(0, 0, 0, 0.7);
+  width: 150px;
+  margin: 0;
+  padding: 0;
+  padding: 5px;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+#bottom-toolbar .menu li ul span {
+  display: block;
+  float: right;
+  padding-right: 10px;
 }
 /* ==|== non-semantic helper classes ========================================
    Please define your styles before this section.

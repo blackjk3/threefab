@@ -18,7 +18,7 @@ Keyboard controls
 * S - Zoom in and out on scene (Zoom also works with mouse wheel)
 * D - Pan around scene
 * X - Delete selected object
-* SPACEBAR - Start stop animation preview
+* SPACE - Start stop animation preview
 
 Viewport
 -------------

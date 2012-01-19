@@ -19,8 +19,21 @@ THREEFAB.Ui = function(viewport) {
 	this.materialView.render();
 	this.transformView.render();
 	this.timelineView.render();
-};
 
+	this.menu = $('.menu');
+	this.menu.bind('click', menuClicked);
+
+	function menuClicked(e) {
+		var target = e.target || e.srcElement,
+			id = target.id;
+
+		if(id === 'menu-animate') {
+			$.publish(THREEFAB.Events.SPACEBAR_PRESSED);
+		} else if(id === 'menu-delete') {
+			$.publish(THREEFAB.Events.DELETE_PRESSED);
+		}
+	}
+};
 
 /**
  * Utils object that has shared functions.

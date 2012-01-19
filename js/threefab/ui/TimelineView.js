@@ -9,7 +9,7 @@
 
 THREEFAB.TimelineView = Backbone.View.extend({
 		
-	el: '#timeline',
+	el: '#bottom-toolbar',
 	canvas: document.createElement("canvas"),
 	c: {},
 	headerHeight:35,

@@ -96,6 +96,8 @@ THREEFAB.Viewport = function( parameters ) {
 	$.subscribe(THREEFAB.Events.TIMELINE_PLAY, playAnimation);
 	$.subscribe(THREEFAB.Events.TIMELINE_PAUSE, pauseAnimation);
 
+	$.subscribe(THREEFAB.Events.DELETE_PRESSED, deleteObject);
+
 	// =============================================================================
 	// DEFAULT Light, Cube.  JUST LIKE BLENDER
 	// =============================================================================
@@ -108,6 +110,10 @@ THREEFAB.Viewport = function( parameters ) {
 	this.duration = 1000;
 	this.interpolation = this.duration / this.keyframes;
 	
+	this.particleSystem = {};
+	this.particleGeometry = {};
+	this.particleCount = 1800;
+
 	//this.addParticleSystem.apply(this);
 	
 	// =============================================================================
@@ -196,6 +202,37 @@ THREEFAB.Viewport = function( parameters ) {
 		$.publish(THREEFAB.Events.VIEWPORT_KEYFRAME_CHANGED, frame);
 		
 	};
+
+	this.processParticles = function() {
+		var ps = _this.particleSystem,
+			pcount = _this.particleCount,
+			particleGeom = this.particleGeometry;
+		
+		while(pcount--) {
+
+			particle = particleGeom.vertices[pcount];
+
+			// check if we need to reset
+			if(particle.position.y < -200) {
+				particle.position.y = 200;
+				particle.velocity.y = 0;
+			}
+			
+			// update the velocity with
+			// a splat of randomniz
+			particle.velocity.y -= Math.random() * 0.1;
+			
+			// and the position
+			particle.position.addSelf(particle.velocity);
+
+		}
+
+		// flag to the particle system that we've
+		// changed its vertices. This is the
+		// dirty little secret.
+		ps.geometry.__dirtyVertices = true;
+			
+	};
 	
 	this.updateManipulator = function() {
 		_this.manipulator.position.copy( _this._SELECTED.position );
@@ -211,8 +248,16 @@ THREEFAB.Viewport = function( parameters ) {
 				_this.keyframes = object.morphTargetInfluences.length;
 				_this.interpolation = _this.duration / _this.keyframes;
 			}
-			console.log(_this.keyframes);
-			console.log(object);
+		}
+	};
+
+	this.selectNextMesh = function() {
+		for(var i=0, len = _this.scene.children.length; i < len; i++) {
+	
+			if(_this.scene.children[i].name) {
+				_this.selected(_this.scene.children[i]);
+				break;
+			}
 		}
 	};
 
@@ -243,7 +288,6 @@ THREEFAB.Viewport = function( parameters ) {
 	function pauseAnimation() {
 		_this.animating = false;
 	}
-	
 
 	function meshCanAnimate() {
 
@@ -252,6 +296,27 @@ THREEFAB.Viewport = function( parameters ) {
 		}
 
 		return false;
+	}
+
+	function deleteObject() {
+
+		if(_this._SELECTED) {
+				
+			if(_this._SELECTED.light) {
+				// If it's a light remove that too
+				_this.scene.remove(_this._SELECTED.light);
+			}
+			
+			// Remove currently selected mesh
+			_this.scene.remove(_this._SELECTED);
+
+			// Get the next object and select that one
+			_this.selectNextMesh();
+
+			// Tell everyone we deleted an object
+			$.publish(THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, _this.scene);
+		}
+
 	}
 	
 	// =============================================================================
@@ -350,7 +415,6 @@ THREEFAB.Viewport = function( parameters ) {
 
 		var bb = _this._SELECTED.geometry.boundingBox;
 
-		console.log(bb);
 		_this.camera.position.x = _this._SELECTED.position.x;
 		_this.camera.position.y = _this._SELECTED.position.y + _this._SELECTED.boundRadius;
 		if(bb.z) {
@@ -374,30 +438,16 @@ THREEFAB.Viewport = function( parameters ) {
 			code = e.which;
 		}
 		
-		// IF it is X then delete whatever object is selected.
 		if (code === 88) {
-			if(_this._SELECTED) {
-				
-				if(_this._SELECTED.light) {
-					_this.scene.remove(_this._SELECTED.light);
-				}
-				
-				_this.scene.remove(_this._SELECTED);
 
-				// Get the next mesh and select that one
-				for(var i=0, len = _this.scene.children.length; i < len; i++) {
-		
-					if(_this.scene.children[i].name) {
-						_this.selected(_this.scene.children[i]);
-						break;
-					}
-				}
+			// X Key
+			$.publish(THREEFAB.Events.DELETE_PRESSED);
 
-				$.publish(THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, _this.scene);
-			}
 		} else if(code === 32) {
+
 			// Spacebar
 			$.publish(THREEFAB.Events.SPACEBAR_PRESSED);
+
 		}
 	});
 };
@@ -460,10 +510,10 @@ THREEFAB.Viewport.prototype = {
 	
 	addParticleSystem: function() {
 		// create the particle variables
-		var particleCount = 1800,
-			particles = new THREE.Geometry(),
+		var particles = new THREE.Geometry(),
 			pMaterial = new THREE.ParticleBasicMaterial({ color: 0xFFFFFF, size: Math.random() * 25 + 10, map: THREE.ImageUtils.loadTexture( "img/particle.png" ), blending: THREE.AdditiveBlending, transparent: true });
-		
+			particleCount = this.particleCount;
+
 		// now create the individual particles
 		for(var p = 0; p < particleCount; p++) {
 		
@@ -473,18 +523,26 @@ THREEFAB.Viewport.prototype = {
 				pY = Math.random() * 500 - 250,
 				pZ = Math.random() * 500 - 250,
 				particle = new THREE.Vertex( new THREE.Vector3(pX, pY, pZ) );
-		
+			
+			// create a velocity vector
+			particle.velocity = new THREE.Vector3(
+				0,              // x
+				-Math.random(), // y: start with random vel
+				0 // z
+			);
+
 			// add it to the geometry
 			particles.vertices.push(particle);
 		}
 		
 		// create the particle system
-		var particleSystem = new THREE.ParticleSystem( particles, pMaterial);
+		this.particleSystem = new THREE.ParticleSystem( particles, pMaterial);
+		this.particleGeometry = particles;
 		
-		particleSystem.sortParticles = true;
+		this.particleSystem.sortParticles = true;
 		
 		// add it to the scene
-		this.scene.add(particleSystem);
+		this.scene.add(this.particleSystem);
 	},
 	
 	addModel: function(mesh) {

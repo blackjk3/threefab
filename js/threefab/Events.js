@@ -31,5 +31,6 @@ THREEFAB.Events = {
 	TIMELINE_PLAY: 'timeline/play',
 	TIMELINE_PAUSE: 'timeline/pause',
 
-	SPACEBAR_PRESSED: 'keyboard/spacebar/pressed'
+	SPACEBAR_PRESSED: 'keyboard/spacebar/pressed',
+	DELETE_PRESSED: 'keyboard/delete/pressed'
 };
