@@ -1,6 +1,5 @@
 /**
  * @author itooamaneatguy / http://kadrmasconcepts.com/blog/
- * @author mr.doob / http://mrdoob.com/
  */
 
 THREEFAB.Events = {
@@ -30,6 +29,8 @@ THREEFAB.Events = {
 	TIMELINE_CHANGED: 'timeline/changed',
 	TIMELINE_PLAY: 'timeline/play',
 	TIMELINE_PAUSE: 'timeline/pause',
+	TIMELINE_RESET: 'timeline/reset',
+	TIMELINE_DURATION_CHANGED: 'timeline/duration/changed',
 
 	SPACEBAR_PRESSED: 'keyboard/spacebar/pressed',
 	DELETE_PRESSED: 'keyboard/delete/pressed'

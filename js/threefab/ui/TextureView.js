@@ -54,7 +54,11 @@ THREEFAB.TextureView = Backbone.View.extend({
 			} else {
 				this.reset();
 			}
+
+			this.el.show();
+			
 		} else {
+			this.el.hide();
 			this.reset();
 		}
 	},

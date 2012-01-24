@@ -31,18 +31,26 @@ THREEFAB.DragDropLoader = function() {
 
 		reader.onload = function ( event ) {
 			var contents = event.target.result,
-				loader, mesh;
+				loader, mesh, json;
 			
 			if(extension === "js") {
+				
 				// We dropping in a mesh.
-
+				json = JSON.parse(contents);
+	
 				loader = new THREE.JSONLoader();
-				loader.createModel( JSON.parse(contents), function ( geometry ) {
-					
+				loader.createModel( json, function ( geometry ) {
+
 					// This is a valid model.
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture() } );
+					var material;
+
+					// Make sure this model has UV coordinates.
+					if(json.uvs[0].length > 0) {
+						material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture() } );
+					} else {
+						material = new THREE.MeshPhongMaterial();
+					}
 					material.name = 'MeshPhongMaterial';
-					
 
 					// Check for morphing targets and add to material.
 					if(geometry.morphTargets.length > 0) {
@@ -62,6 +70,10 @@ THREEFAB.DragDropLoader = function() {
 						mesh.name = "THREE.JSONLoader." + mesh.id;
 					}
 					
+					if(json.scale) {
+						mesh.scale.x = mesh.scale.y = mesh.scale.z = json.scale;
+					}
+
 					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
 				});

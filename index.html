@@ -12,7 +12,7 @@
        More info: h5bp.com/b/378 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>ThreeFab | Three.js fabrication tool.</title>
+  <title>ThreeFab | Three.js fabrication tool</title>
   <meta name="description" content="Three.js fabrication tool.">
   <meta name="author" content="Jason Kadrmas">
 
@@ -40,7 +40,6 @@
   <div id="toolbox">
     <div id="logo"></div>
     
-
     <div class="righttools clearfix">
       <ul class="light-list clearfix">
         <li><a href="#point" class="point" data-placement="below" title="Point"></a></li>
@@ -78,6 +77,8 @@
       <button class="back button"><span></span></button><button id="playButton" class="play button"><span></span></button><button class="forward button"><span></span></button>
     </div>
     <div class="timeline-container"></div>
+    <input type="text" id="duration" name="duration" value="1" maxlength="5">&nbsp;sec
+
     <div class="menu clearfix">
       <ul>
         <li>Object
@@ -113,6 +114,7 @@
   
   <script src="js/threefab/extras/loaders/DragDropLoader.js"></script>
   <script src="js/threefab/extras/exporter/Exporter.js"></script>
+  <script src="js/threefab/extras/animation/AnimationMorphTarget.js"></script>
 
   <script src="js/threefab/lights/PointLightContainer.js"></script>
   <script src="js/threefab/lights/SpotLightContainer.js"></script>

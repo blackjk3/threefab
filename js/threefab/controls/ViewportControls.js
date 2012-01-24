@@ -376,8 +376,6 @@ THREE.ViewportControls = function ( object, domElement ) {
 		_zoomStart.y += delta;
 		_zoomEnd.y = _zoomStart.y + (speed * _this.mouseWheelSpeed);
 		
-		console.log(_zoomStart.y + " : " + _zoomEnd.y);
-		console.log(speed + " : " + _this.mouseWheelSpeed);
 	});
 
 };
