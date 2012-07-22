@@ -10,8 +10,8 @@ THREEFAB.PointLightContainer = function ( scene, hex, intensity, distance ) {
 		mesh = new THREE.Mesh(geometry, material);
 		
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vertex() );
-	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 30, 1 ) ) );
+	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 30, 1 ) );
 	
 	var line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : 0xFFFFFF } ) );
 	line.rotation.z = - Math.PI;

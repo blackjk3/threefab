@@ -71,6 +71,7 @@ THREEFAB.Viewport = function( parameters ) {
 	
 	// Scene
 	this.scene = new THREE.Scene();
+	this.scene.add(this.camera);
 	
 	//Grid
 	if(this.grid) {
@@ -347,8 +348,14 @@ THREEFAB.Viewport = function( parameters ) {
 		_projector.unprojectVector( vector, _this.camera );
 
 		var ray = new THREE.Ray( _this.camera.position, vector.subSelf( _this.camera.position ).normalize() );
-
-		var intersects = ray.intersectScene( _this.scene );
+		
+		var toIntersect = [];
+		THREE.SceneUtils.traverseHierarchy(_this.scene, function(child) {
+	        if (child instanceof THREE.Mesh && !(child.geometry instanceof THREE.PlaneGeometry)) {
+	            toIntersect.push(child);
+	        }
+		});
+		var intersects = ray.intersectObjects( toIntersect );
 
 		if ( intersects.length > 0 ) {
 			
@@ -530,7 +537,7 @@ THREEFAB.Viewport.prototype = {
 			var pX = Math.random() * 500 - 250,
 				pY = Math.random() * 500 - 250,
 				pZ = Math.random() * 500 - 250,
-				particle = new THREE.Vertex( new THREE.Vector3(pX, pY, pZ) );
+				particle = new THREE.Vector3( pX, pY, pZ );
 			
 			// create a velocity vector
 			particle.velocity = new THREE.Vector3(

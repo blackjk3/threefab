@@ -25,13 +25,13 @@ THREE.Grid = function () {
 	}*/
 	
 	var _grid = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x606060, wireframe: true, transparent: true } ) );
-	_grid.rotation.x = Math.PI / 2;
+	_grid.rotation.y = Math.PI / 2;
 	
 	this.add(_grid);
 	
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( new THREE.Vertex() );
-	lineGeometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 0, 1000, 1 ) ) );
+	lineGeometry.vertices.push( new THREE.Vector3( ) );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 1000, 1 ) );
 	
 	// x
 	var line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : 0xff0000 } ) );
