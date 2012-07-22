@@ -68,6 +68,13 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.light.el.hide();
 	},
 
+	hideMeshView: function() {
+	    this.folders.materials.close();
+        this.folders.textures.close();
+        this.color.el.hide();
+        this.texture.el.hide();
+	},
+	
 	meshChanged: function(object) {
 
 		this.selected = object;
@@ -75,12 +82,16 @@ THREEFAB.MaterialView = Backbone.View.extend({
 		this.folders.lights.close();
 
 		this.resetControllers();
-		this.addMaterialOptions();
 		
-		this.folders.materials.open();
-		this.folders.textures.open();
-		this.color.el.show();
-		this.texture.el.show();
+		if (this.selected.material && this.selected.material.name) {
+    		this.addMaterialOptions();
+    		this.folders.materials.open();
+    		this.folders.textures.open();
+    		this.color.el.show();
+    		this.texture.el.show();
+		} else {
+            this.hideMeshView();
+		}
 		
 		this.light.el.hide();
 		//this.rebuildMaterial();
@@ -94,11 +105,7 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 		this.light.el.show();
 			
-		this.folders.materials.close();
-		this.color.el.hide();
-		
-		this.folders.textures.close();
-		this.texture.el.hide();
+		this.hideMeshView();
 
 		this.resetControllers();
 		
@@ -117,12 +124,14 @@ THREEFAB.MaterialView = Backbone.View.extend({
 
 	
 	addMaterialOptions: function() {
-		
-		// Add Material shader options.
-		this.folders.materials.add(this.selected.material, 'name', {Basic: 'MeshBasicMaterial', Phong:'MeshPhongMaterial', Lambert: 'MeshLambertMaterial'}).onChange( this.rebuildMaterial );
-	
-		// Loop and add material properties.
-		THREEFAB.Ui.utils.addProperties(this.selected.material, this.model.materialList, this.folders.materials, this);
+	    
+	    if (this.selected.material) {
+    		// Add Material shader options.
+    		this.folders.materials.add(this.selected.material, 'name', {Basic: 'MeshBasicMaterial', Phong:'MeshPhongMaterial', Lambert: 'MeshLambertMaterial'}).onChange( this.rebuildMaterial );
+    	
+    		// Loop and add material properties.
+    		THREEFAB.Ui.utils.addProperties(this.selected.material, this.model.materialList, this.folders.materials, this);
+	    }
 	},
 
 	changeColor: function(c, type) {

@@ -61,7 +61,11 @@ THREEFAB.Exporter.Utils = {
 	},
 
 	scene: function() {
-		return '\n\nscene = new THREE.Scene();';
+		var str = ['\n\nscene = new THREE.Scene();'];
+		
+		str.push('scene.add( camera );');
+		
+		return str.join('\n');
 	},
 
 	renderer: function() {
@@ -70,7 +74,7 @@ THREEFAB.Exporter.Utils = {
 
 		str.push('renderer.setSize( width, height );');
 		str.push('renderer.shadowCameraNear = 3;');
-		str.push('renderer.shadowCameraFar = this.camera.far;');
+		str.push('renderer.shadowCameraFar = camera.far;');
 		str.push('renderer.shadowCameraFov = 50;');
 		str.push('renderer.shadowMapBias = 0.0039;');
 		str.push('renderer.shadowMapDarkness = 0.5;');
@@ -127,26 +131,42 @@ THREEFAB.Exporter.Utils = {
 						str.push( THREEFAB.Exporter.Utils.geometries.plane(children[i]) );
 					} else if(meshtype === "TorusGeometry") {
 						str.push( THREEFAB.Exporter.Utils.geometries.torus(children[i]) );
-					} else if(meshtype === "JSONLoader" || "SkinnedMesh") {
+					} else if(meshtype === "JSONLoader" || meshtype === "SkinnedMesh") {
 						if(!loaderUsed) {
 							str.push('\nvar loader = new THREE.JSONLoader();');
 						}
 						
 						str.push('loader.load( "path/to/model.js", function(geometry) {');
+					} else if (meshtype === 'ColladaLoader') {
+					    loader = new THREE.ColladaLoader();
+		                
+		                if(!loaderUsed) {
+                            str.push('\nvar collada_loader = new THREE.ColladaLoader();');
+                            str.push('\ncollada_loader.options.convertUpAxis = true;');
+                        }
+                        
+                        var importURL = "path/to/model.dae";
+                        if (children[i].importURL) {
+                            importURL = children[i].importURL;
+                        }
+                        str.push('collada_loader.load( "' + importURL + '", function(dae) {');
+					} else {
+					    continue;
 					}
-
+					
 					// Material
 					str.push( THREEFAB.Exporter.Utils.material(children[i].material, materialModel.materialList) );
 
-					if(children[i].geometry.morphTargets.length > 0) {
+					if(children[i].geometry && children[i].geometry.morphTargets.length > 0) {
 						str.push('material.morphTargets = true;');
 					}
 
 					// Mesh
 					if(meshtype === "SkinnedMesh") {
 						str.push('var mesh = new THREE.SkinnedMesh(geometry, material);');
-					}
-					else {
+					} else if( meshtype == "ColladaLoader") {
+					    str.push('var mesh = dae.scene;');
+					} else {
 						str.push('var mesh = new THREE.Mesh(geometry, material);');
 					}
 
@@ -154,10 +174,10 @@ THREEFAB.Exporter.Utils = {
 
 					// Add child
 					str.push('scene.add( mesh );');
-
-					if(meshtype === "JSONLoader"  || "SkinnedMesh") {
-						str.push('});');
-					}
+					
+					if(meshtype === "JSONLoader" || meshtype === "SkinnedMesh" || meshtype == "ColladaLoader") {
+                        str.push('});');
+                    }
 				}
 
 			}
@@ -186,8 +206,11 @@ THREEFAB.Exporter.Utils = {
 	},
 
 	material: function(material, materialList) {
+		if (!(material && material.name)) {
+		    return '';
+		}
 		
-		var mat = new THREE[material.name](),
+ 		var mat = new THREE[material.name](),
 			html = 'var material = new THREE.' + material.name + '();\n';
 
 		for(var i = 0, len = materialList.length; i < len; i++) {

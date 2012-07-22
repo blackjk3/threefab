@@ -42,7 +42,7 @@ THREEFAB.TextureView = Backbone.View.extend({
 				
 		var texture;
 
-		if(object.material.map) {
+		if(object.material && object.material.map) {
 
 			texture = object.material.map;
 			
