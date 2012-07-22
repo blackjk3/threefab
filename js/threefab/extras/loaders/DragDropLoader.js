@@ -3,6 +3,43 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
+THREEFAB.PrepareCollada = function(collada) {
+    var sceneBSCenter = null;
+    var sceneBSRadius = null;
+    THREE.SceneUtils.traverseHierarchy( collada.scene, function (object) {
+        if (object instanceof THREE.Mesh) {
+            var radius = object.geometry.boundingSphere.radius;
+
+            // Object center in world space
+            var objectCenterLocal = object.position.clone();
+            var objectCenterWorld = object.matrixWorld.multiplyVector3(objectCenterLocal);
+            
+            if (sceneBSCenter === null) {
+                sceneBSCenter = objectCenterWorld;
+                sceneBSRadius = radius;
+                return;
+            }
+            
+            // New center in world space
+            var newCenter = new THREE.Vector3();
+            newCenter.add(sceneBSCenter, objectCenterWorld);
+            newCenter.divideScalar(2.0);
+
+            // New radius in world space
+            var dCenter = newCenter.distanceTo(sceneBSCenter);
+            var newRadius = Math.max(dCenter + radius, dCenter + sceneBSRadius);
+            sceneBSCenter = newCenter;
+            sceneBSRadius = newRadius;
+        }
+    })
+    
+    var mesh = collada.scene;
+    mesh.name = "THREE.ColladaLoader." + mesh.id;
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = 100 / sceneBSRadius;
+    
+    return mesh;
+};
+
 THREEFAB.DragDropLoader = function() {
 	
 	window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -31,7 +68,7 @@ THREEFAB.DragDropLoader = function() {
 
 		reader.onload = function ( event ) {
 			var contents = event.target.result,
-				loader, mesh, json;
+				loader, mesh, json, collada;
 			
 			if(extension === "js") {
 				
@@ -77,6 +114,16 @@ THREEFAB.DragDropLoader = function() {
 					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
 				});
+			} else if(extension === "dae") {
+			    
+			    loader = new THREE.ColladaLoader();
+			    loader.options.convertUpAxis = true;
+	            collada = loader.parse( $.parseXML( contents ) );
+
+                mesh = THREEFAB.PrepareCollada(collada);
+	            
+	            $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
+			    
 			} else if(isImage) {
 
 				// We are dropping in a texture.
@@ -94,7 +141,7 @@ THREEFAB.DragDropLoader = function() {
 			
 		};
 		
-		if(extension === 'js') {
+		if(extension === 'js' || extension === "dae") {
 			// JSON model file.
 			reader.readAsText( file );
 		} else if(isImage) {

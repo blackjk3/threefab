@@ -87,6 +87,7 @@ THREEFAB.Viewport = function( parameters ) {
 	$.subscribe(THREEFAB.Events.MODEL_LOADED, $.proxy(this.addModel, this));
 	$.subscribe(THREEFAB.Events.TEXTURE_LOADED, $.proxy(this.addTexture, this));
 	$.subscribe(THREEFAB.Events.PRIMITIVE_ADDED, $.proxy(this.addPrimitive, this));
+	$.subscribe(THREEFAB.Events.IMPORT_EXTERNAL, $.proxy(this.importExternal, this));
 	$.subscribe(THREEFAB.Events.LIGHT_ADDED, $.proxy(this.addLight, this));
 	$.subscribe(THREEFAB.Events.TEXTURE_CLEAR, $.proxy(this.clearTexture, this));
 
@@ -159,7 +160,7 @@ THREEFAB.Viewport = function( parameters ) {
 		pauseAnimation();
 
 		// Remove the current overdraw
-		if(_this._SELECTED) {
+		if(_this._SELECTED && _this._SELECTED.material) {
 			_this._SELECTED.material.program = null;
 			_this._SELECTED.material.overdraw = false;
 		}
@@ -356,19 +357,25 @@ THREEFAB.Viewport = function( parameters ) {
 	        }
 		});
 		var intersects = ray.intersectObjects( toIntersect );
-
+		
 		if ( intersects.length > 0 ) {
+		    
+		    var hit = intersects[0].object;
+		    var is_manipulator = hit.name === "x_manipulator" || hit.name === "y_manipulator" || hit.name === "z_manipulator";
+		    while (!(is_manipulator || hit.parent instanceof THREE.Scene)) {
+		        hit = hit.parent;
+		    }
 			
 			// Are we already selected?
-			if ( _SELECTED_AXIS != intersects[ 0 ].object  && (intersects[ 0 ].object.name === "x_manipulator" || intersects[ 0 ].object.name === "y_manipulator" || intersects[ 0 ].object.name === "z_manipulator")) {
+			if ( _SELECTED_AXIS != hit  && is_manipulator) {
 
 				_this.controls.noRotate = true;
-				_SELECTED_AXIS = intersects[0].object;
+				_SELECTED_AXIS = hit;
 				
 			} else {
 				
 				// This is an object and not a grid handle.
-				_this.selected(intersects[0].object);
+				_this.selected(hit);
 				_SELECTED_DOWN = true;
 
 			}
@@ -522,6 +529,37 @@ THREEFAB.Viewport.prototype = {
 		
 		return mesh;
 	},
+	
+    importExternal: function() {
+    
+        var txt = 'Enter a 3D model URL:<br />' +
+            '<input type="text" id="importURL" ' +
+            'name="importURL" value="" />';
+            
+        var _scene = this.scene;
+        function importcallback(e, v, m, f) {
+            if (v === 'Import') {
+            
+                loader = new THREE.ColladaLoader();
+                loader.options.convertUpAxis = true;
+                collada = loader.load( f.importURL, function(collada) {
+
+                    mesh = THREEFAB.PrepareCollada(collada);
+                    mesh.importURL = f.importURL;
+                    _scene.add(mesh);
+                
+                    $.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, _scene);
+            
+                });
+            }
+        }
+
+        $.prompt(txt, {
+            callback: importcallback,
+            buttons: { Import: 'Import', Cancel: 'Cancel' }
+        });
+        
+    },
 	
 	addParticleSystem: function() {
 		// create the particle variables
