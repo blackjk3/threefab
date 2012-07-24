@@ -50,6 +50,10 @@ div.jqi button:hover{
     background-color: #728A8C;
 }
 div.jqi button.jqidefaultbutton{
+    background-color: #2FA1D6;
+}
+
+div.jqi button.jqidefaultbutton:hover {
     background-color: #BF5E26;
 }
 .jqiwarning .jqi .jqibuttons{
