@@ -37,7 +37,7 @@ THREEFAB.Viewport = function( parameters ) {
 	this.camera.position.x = 500;
 	this.camera.position.y = 250;
 	this.camera.position.z = 500;
-	this.camera.lookAt( new THREE.Vector3() );
+	//this.camera.lookAt( new THREE.Vector3() );
 	
 	// Setup renderer
 	this.renderer = new THREE.WebGLRenderer( { clearAlpha: 1, clearColor: 0x808080 } );
@@ -80,7 +80,7 @@ THREEFAB.Viewport = function( parameters ) {
 			
 		// Axis
 		this.manipulator = new THREE.ManipulatorTool();
-		this.scene.add(this.manipulator);
+		this.scene.add( this.manipulator );
 	}
 	
 	// Drag and drop functionality
@@ -227,6 +227,7 @@ THREEFAB.Viewport = function( parameters ) {
 	};
 	
 	this.updateManipulator = function() {
+    // Set the manipulator in just in front of the object.
 		_this.manipulator.position.copy( _this._SELECTED.position );
 	};
 
@@ -344,27 +345,29 @@ THREEFAB.Viewport = function( parameters ) {
 		event.preventDefault();
 		
 		// find intersections
-		
 		var vector = new THREE.Vector3( _mouse.x, _mouse.y, 1 );
 		_projector.unprojectVector( vector, _this.camera );
 
 		var ray = new THREE.Ray( _this.camera.position, vector.subSelf( _this.camera.position ).normalize() );
-		
 		var toIntersect = [];
-		THREE.SceneUtils.traverseHierarchy(_this.scene, function(child) {
-	        if (child instanceof THREE.Mesh && !(child.geometry instanceof THREE.PlaneGeometry)) {
-	            toIntersect.push(child);
-	        }
+
+    THREE.SceneUtils.traverseHierarchy( _this.scene, function( child ) {
+      
+      if (child instanceof THREE.Mesh && !(child.geometry instanceof THREE.PlaneGeometry)) {
+        toIntersect.push(child);
+      }
+
 		});
-		var intersects = ray.intersectObjects( toIntersect );
+    var intersects = ray.intersectObjects( toIntersect );
 		
 		if ( intersects.length > 0 ) {
-		    
-		    var hit = intersects[0].object;
-		    var is_manipulator = hit.name === "x_manipulator" || hit.name === "y_manipulator" || hit.name === "z_manipulator";
-		    while (!(is_manipulator || hit.parent instanceof THREE.Scene)) {
-		        hit = hit.parent;
-		    }
+      console.log(intersects);
+      var hit = intersects[0].object;
+      var is_manipulator = hit.name === "x_manipulator" || hit.name === "y_manipulator" || hit.name === "z_manipulator";
+      console.log(hit.name);
+      while ( !(is_manipulator || hit.parent instanceof THREE.Scene) ) {
+        hit = hit.parent;
+      }
 			
 			// Are we already selected?
 			if ( _SELECTED_AXIS != hit  && is_manipulator) {
@@ -375,7 +378,7 @@ THREEFAB.Viewport = function( parameters ) {
 			} else {
 				
 				// This is an object and not a grid handle.
-				_this.selected(hit);
+				_this.selected( hit );
 				_SELECTED_DOWN = true;
 
 			}
@@ -384,6 +387,7 @@ THREEFAB.Viewport = function( parameters ) {
 		
 		// Log the camera postion. If it moves then don't deselect any selected items.
 		_prev_camera = _this.camera;
+
 	});
 
 	// ----------------------------------------
@@ -426,6 +430,7 @@ THREEFAB.Viewport = function( parameters ) {
 			
 			if ( _this._SELECTED  ) {
 				_this._SELECTED.position.copy( _this.manipulator.position );
+        $.publish( THREEFAB.Events.MANIPULATOR_UPDATED );
 			}
 		}
 	});
@@ -629,11 +634,23 @@ THREEFAB.Viewport.prototype = {
 	},
 	
 	addTexture: function(tex) {
-		if(!this._SELECTED.light) {
-			this._SELECTED.material.program = null;
-			this._SELECTED.material.program = null;
 
-			this._SELECTED.material.map = tex;
+		if ( !this._SELECTED.light ) {
+
+      
+      if ( this._SELECTED.name.search('OBJLoader') !== -1  ) {
+        
+        for ( var i = 0, l = this._SELECTED.children.length; i < l; i ++ ) {
+          this._SELECTED.children[ i ].material.map = tex;
+        }
+
+      } else {
+        
+        this._SELECTED.material.program = null;
+        this._SELECTED.material.map = tex;
+
+      }
+			
 
 			$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);
 		}
@@ -641,8 +658,18 @@ THREEFAB.Viewport.prototype = {
 
 	clearTexture: function() {
 		
-		this._SELECTED.material.program = null;
-		this._SELECTED.material.map = new THREEFAB.CanvasTexture();
+    if ( this._SELECTED.name.search('OBJLoader') !== -1  ) {
+
+      for ( var i = 0, l = this._SELECTED.children.length; i < l; i ++ ) {
+        this._SELECTED.children[ i ].program = null;
+        this._SELECTED.children[ i ].map = new THREEFAB.CanvasTexture();
+      }
+      
+    } else {
+      this._SELECTED.material.program = null;
+      this._SELECTED.material.map = new THREEFAB.CanvasTexture();
+    }
+		
 
 	},
 	

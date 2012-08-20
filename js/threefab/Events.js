@@ -12,6 +12,8 @@ THREEFAB.Events = {
 	VIEWPORT_TARGET_CENTER: 'viewport/target/center',
 	VIEWPORT_KEYFRAME_CHANGED: 'viewport/keyframe/changed',
 
+  MANIPULATOR_UPDATED: 'manipulator/updated',
+
 	MATERIAL_COLOR_CHANGED: 'material/color/changed',
 	LIGHT_COLOR_CHANGED: 'light/color/changed',
 	OUTLINER_CHANGED: 'outliner/changed',

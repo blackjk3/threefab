@@ -4,8 +4,10 @@
  */
 
 THREEFAB.PrepareCollada = function(collada) {
+    
     var sceneBSCenter = null;
     var sceneBSRadius = null;
+
     THREE.SceneUtils.traverseHierarchy( collada.scene, function (object) {
         if (object instanceof THREE.Mesh) {
             var radius = object.geometry.boundingSphere.radius;
@@ -31,10 +33,10 @@ THREEFAB.PrepareCollada = function(collada) {
             sceneBSCenter = newCenter;
             sceneBSRadius = newRadius;
         }
-    })
+    });
     
     var mesh = collada.scene;
-    mesh.name = "THREE.ColladaLoader." + mesh.id;
+    mesh.name = 'THREE.ColladaLoader.' + mesh.id;
     mesh.scale.x = mesh.scale.y = mesh.scale.z = 100 / sceneBSRadius;
     
     return mesh;
@@ -62,15 +64,15 @@ THREEFAB.DragDropLoader = function() {
 		var reader = new FileReader();
 		var isImage = false;
 
-		if(extension === "jpg" || extension === "png") {
+		if( extension === 'jpg' || extension === 'png' ) {
 			isImage = true;
 		}
 
 		reader.onload = function ( event ) {
 			var contents = event.target.result,
-				loader, mesh, json, collada;
+          loader, mesh, json, collada;
 			
-			if(extension === "js") {
+			if(extension === 'js') {
 				
 				// We dropping in a mesh.
 				json = JSON.parse(contents);
@@ -98,13 +100,13 @@ THREEFAB.DragDropLoader = function() {
 						
 						// Check for skinned mesh
 						mesh = new THREE.SkinnedMesh( geometry, material );
-						mesh.name = "THREE.SkinnedMesh." + mesh.id;
+						mesh.name = 'THREE.SkinnedMesh.' + mesh.id;
 					
 					} else {
 
 						// Regular mesh.
 						mesh = new THREE.Mesh( geometry, material );
-						mesh.name = "THREE.JSONLoader." + mesh.id;
+						mesh.name = 'THREE.JSONLoader.' + mesh.id;
 					}
 					
 					if(json.scale) {
@@ -114,16 +116,24 @@ THREEFAB.DragDropLoader = function() {
 					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
 
 				});
-			} else if(extension === "dae") {
-			    
-			    loader = new THREE.ColladaLoader();
-			    loader.options.convertUpAxis = true;
-	            collada = loader.parse( $.parseXML( contents ) );
+			} else if(extension === 'dae') {
 
-                mesh = THREEFAB.PrepareCollada(collada);
-	            
-	            $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
-			    
+        loader = new THREE.ColladaLoader();
+        loader.options.convertUpAxis = true;
+        collada = loader.parse( $.parseXML( contents ) );
+
+        mesh = THREEFAB.PrepareCollada(collada);
+
+        $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
+
+      } else if(extension === 'obj') {
+
+        loader = new THREE.OBJLoader();
+        mesh = loader.parse( contents );
+        mesh.name = 'THREE.OBJLoader.' + mesh.id;
+
+        $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
+
 			} else if(isImage) {
 
 				// We are dropping in a texture.
@@ -135,13 +145,14 @@ THREEFAB.DragDropLoader = function() {
 				texture.needsUpdate = true;
 				
 				img.onload = function() {
+          console.log(texture);
 					$.publish(THREEFAB.Events.TEXTURE_LOADED, texture);
 				};
 			}
 			
 		};
 		
-		if(extension === 'js' || extension === "dae") {
+		if(extension === 'js' || extension === 'dae' || extension === 'obj') {
 			// JSON model file.
 			reader.readAsText( file );
 		} else if(isImage) {

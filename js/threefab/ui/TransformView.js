@@ -32,16 +32,16 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.viewport = arguments[0].viewport;
 
 		// Listen to when an object is selected.
-		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.addTransformOptions);
-		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.addTransformOptions);
-
+		$.subscribe( THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.addTransformOptions );
+		$.subscribe( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.addTransformOptions );
+    $.subscribe( THREEFAB.Events.MANIPULATOR_UPDATED, this.update );
 	},
 	
 	render: function() {
 		
 		// Create transform gui element.
-		this.gui = new dat.GUI({ autoPlace: false, hide:false });
-		this.el.append(this.gui.domElement);
+		this.gui = new dat.GUI({ autoPlace: false, hide: false });
+		this.el.append( this.gui.domElement );
 		
 		// Add Camera
 		this.folders.camera = this.gui.addFolder('Camera')	;
@@ -66,13 +66,16 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.addTransformOptions();
 		this.folders.transforms.open();
 
+    // Add Shadows
+    this.folders.shadows = this.gui.addFolder('Shadows');
+    this.addShadowOptions();
 	},
 
 	addCameraOptions: function() {
 
-		this.folders.camera.add(this.viewport.camera.position, 'x').listen();
-		this.folders.camera.add(this.viewport.camera.position, 'y').listen();
-		this.folders.camera.add(this.viewport.camera.position, 'z').listen();
+		this.folders.camera.add( this.viewport.camera.position, 'x' ).listen();
+		this.folders.camera.add( this.viewport.camera.position, 'y' ).listen();
+		this.folders.camera.add( this.viewport.camera.position, 'z' ).listen();
 		
 	},
 
@@ -83,40 +86,45 @@ THREEFAB.TransformView = Backbone.View.extend({
 
 		THREEFAB.Ui.utils.removeFolderControllers(this.folders.transforms);
 
-
-		this.folders.transforms.add(selected.position, 'x').listen().onChange(function(){
-			viewport.updateManipulator();
-		});
-		
-		this.folders.transforms.add(selected.position, 'y').listen().onChange(function(){
-			viewport.updateManipulator();
-		});
-
-		this.folders.transforms.add(selected.position, 'z').listen().onChange(function(){
-			viewport.updateManipulator();
-		});
+    // Position
+    this.folders.transforms.add( selected.position, 'x' ).onChange( viewport.updateManipulator );
+    this.folders.transforms.add( selected.position, 'y' ).onChange( viewport.updateManipulator );
+    this.folders.transforms.add( selected.position, 'z' ).onChange( viewport.updateManipulator );
 		
 		// Rotation
-		this.folders.transforms.add(selected.rotation, 'x', -Math.PI, Math.PI);
-		this.folders.transforms.add(selected.rotation, 'y', -Math.PI, Math.PI);
-		this.folders.transforms.add(selected.rotation, 'z', -Math.PI, Math.PI);
+		this.folders.transforms.add( selected.rotation, 'x', -Math.PI, Math.PI ).name('Rotation X');
+		this.folders.transforms.add( selected.rotation, 'y', -Math.PI, Math.PI ).name('Rotation Y');
+		this.folders.transforms.add( selected.rotation, 'z', -Math.PI, Math.PI ).name('Rotation Z');
 		
 		if(!selected.light) {
 			
 			// Scale
-			this.folders.transforms.add(selected.scale, 'x', 0);
-			this.folders.transforms.add(selected.scale, 'y', 0);
-			this.folders.transforms.add(selected.scale, 'z', 0);
+			this.folders.transforms.add( selected.scale, 'x', 0 ).name('Scale X');
+			this.folders.transforms.add( selected.scale, 'y', 0 ).name('Scale Y');
+			this.folders.transforms.add( selected.scale, 'z', 0 ).name('Scale Z');
 			
 		}
-		
-		// Shadows
-		this.folders.transforms.add(selected, 'castShadow');
-		this.folders.transforms.add(selected, 'receiveShadow').onChange(function() {
-			viewport.resetMaterials();
-		});
 
-	}
+	},
+
+  addShadowOptions: function() {
+    
+    var selected = this.viewport._SELECTED;
+    var viewport = this.viewport;
+
+    this.folders.shadows.add(selected, 'castShadow');
+    this.folders.shadows.add(selected, 'receiveShadow').onChange( viewport.resetMaterials );
+  },
+
+  update: function() {
+    
+    var trans = this.folders.transforms;
+    
+    for ( var i in trans.__controllers ) {
+      trans.__controllers[i].updateDisplay();
+    }
+    
+  }
 
 
 });
