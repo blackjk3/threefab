@@ -34,10 +34,8 @@ THREEFAB.AmbientLightContainer = function ( scene, hex) {
 	light.rotation = mesh.rotation;
 	
 	mesh.light = light;
-	
-	scene.add(mesh);
-	scene.add(light);
-	
-	
-	this.mesh = mesh;
+  mesh.add(light);
+
+  this.mesh = mesh;
+  scene.add(mesh);
 };

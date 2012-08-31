@@ -32,13 +32,13 @@ THREEFAB.TextureView = Backbone.View.extend({
 		this.el.append(this.texture);
 		this.el.append(this.label);
 
-		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.render);
-		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.render);
-		$.subscribe(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this.render);
+		$.subscribe( THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.render );
+		$.subscribe( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.render );
+		$.subscribe( THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this.render );
 	},
 
 
-	render: function(object) {
+	render: function( event, object ) {
 				
 		var texture;
 

@@ -16,7 +16,11 @@ THREEFAB.Events = {
 
 	MATERIAL_COLOR_CHANGED: 'material/color/changed',
 	LIGHT_COLOR_CHANGED: 'light/color/changed',
+
 	OUTLINER_CHANGED: 'outliner/changed',
+  OUTLINER_PARENT_CHANGED: 'outliner/parent/changed',
+  OUTLINER_VISIBLE: 'outliner/visible',
+  OUTLINER_LOCKED: 'outliner/locked',
 
 	MODEL_LOADED: 'model/loaded',
 
@@ -36,5 +40,6 @@ THREEFAB.Events = {
 	TIMELINE_DURATION_CHANGED: 'timeline/duration/changed',
 
 	SPACEBAR_PRESSED: 'keyboard/spacebar/pressed',
-	DELETE_PRESSED: 'keyboard/delete/pressed'
+	DELETE_PRESSED: 'keyboard/delete/pressed',
+  SHIFT_D_PRESSED: 'keyboard/shift/d/pressed'
 };

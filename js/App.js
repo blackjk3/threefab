@@ -10,8 +10,8 @@
 	// Ready
 	$(document).ready(function(){
 
-		var dragDrop = new THREEFAB.DragDropLoader(),
-			viewport = new THREEFAB.Viewport(),
+		var viewport = new THREEFAB.Viewport(),
+      dragDrop = new THREEFAB.DragDropLoader(),
 			ui = new THREEFAB.Ui(viewport),
 			toolbox = new THREEFAB.Toolbox(),
 			exporter = new THREEFAB.Exporter();

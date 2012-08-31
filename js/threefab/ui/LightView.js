@@ -27,10 +27,10 @@ THREEFAB.LightView = Backbone.View.extend({
 
 		this.el.append( this.types.color );
 
-		$.subscribe(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.lightChanged);
+		$.subscribe( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.lightChanged );
 	},
 
-	lightChanged: function( object ) {
+	lightChanged: function( event, object ) {
 		
 		var color = { r: object.light.color.r*255, g:object.light.color.g*255, b:object.light.color.b*255 };
 

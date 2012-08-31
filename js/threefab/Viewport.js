@@ -21,7 +21,8 @@ THREEFAB.Viewport = function( parameters ) {
 		_SELECTED_AXIS,
 		_projector = new THREE.Projector(),
 		SHADOW_MAP_WIDTH = 2048,
-		SHADOW_MAP_HEIGHT = 1024;
+		SHADOW_MAP_HEIGHT = 1024,
+    clock = new THREE.Clock();
 	
 	_container.style.position = 'absolute';
 	_container.style.overflow = 'hidden';
@@ -84,28 +85,27 @@ THREEFAB.Viewport = function( parameters ) {
 	}
 	
 	// Drag and drop functionality
-	$.subscribe(THREEFAB.Events.MODEL_LOADED, $.proxy(this.addModel, this));
-	$.subscribe(THREEFAB.Events.TEXTURE_LOADED, $.proxy(this.addTexture, this));
-	$.subscribe(THREEFAB.Events.PRIMITIVE_ADDED, $.proxy(this.addPrimitive, this));
-	$.subscribe(THREEFAB.Events.IMPORT_EXTERNAL, $.proxy(this.importExternal, this));
-	$.subscribe(THREEFAB.Events.LIGHT_ADDED, $.proxy(this.addLight, this));
-	$.subscribe(THREEFAB.Events.TEXTURE_CLEAR, $.proxy(this.clearTexture, this));
+	$.subscribe( THREEFAB.Events.MODEL_LOADED, $.proxy(this.addModel, this) );
+	$.subscribe( THREEFAB.Events.TEXTURE_LOADED, $.proxy(this.addTexture, this) );
+	$.subscribe( THREEFAB.Events.PRIMITIVE_ADDED, $.proxy(this.addPrimitive, this) );
+	$.subscribe( THREEFAB.Events.IMPORT_EXTERNAL, $.proxy(this.importExternal, this) );
+	$.subscribe( THREEFAB.Events.LIGHT_ADDED, $.proxy(this.addLight, this) );
+	$.subscribe( THREEFAB.Events.TEXTURE_CLEAR, $.proxy(this.clearTexture, this) );
 
-	$.subscribe(THREEFAB.Events.OUTLINER_CHANGED, outlinerChanged);
-	$.subscribe(THREEFAB.Events.VIEWPORT_TARGET_CENTER, targetCenter);
+	$.subscribe( THREEFAB.Events.OUTLINER_CHANGED, outlinerChanged );
+  $.subscribe( THREEFAB.Events.OUTLINER_PARENT_CHANGED, outlinerParentChanged );
 
-	$.subscribe(THREEFAB.Events.TIMELINE_CHANGED, updateMeshFrame);
-	$.subscribe(THREEFAB.Events.TIMELINE_PLAY, playAnimation);
-	$.subscribe(THREEFAB.Events.TIMELINE_PAUSE, pauseAnimation);
-	$.subscribe(THREEFAB.Events.TIMELINE_DURATION_CHANGED, changeAnimationDuration);
+	$.subscribe( THREEFAB.Events.VIEWPORT_TARGET_CENTER, targetCenter );
 
-	$.subscribe(THREEFAB.Events.DELETE_PRESSED, deleteObject);
+	// $.subscribe( THREEFAB.Events.TIMELINE_CHANGED, updateMeshFrame );
+	$.subscribe( THREEFAB.Events.TIMELINE_PLAY, playAnimation );
+	// $.subscribe( THREEFAB.Events.TIMELINE_PAUSE, pauseAnimation );
+	// $.subscribe( THREEFAB.Events.TIMELINE_DURATION_CHANGED, changeAnimationDuration );
 
-	// =============================================================================
-	// DEFAULT Light, Cube.  JUST LIKE BLENDER
-	// =============================================================================
-	
-	this.setupDefaultScene.apply(this);
+	$.subscribe( THREEFAB.Events.DELETE_PRESSED, deleteObject );
+  $.subscribe( THREEFAB.Events.SHIFT_D_PRESSED, duplicateObject );
+  $.subscribe( THREEFAB.Events.OUTLINER_VISIBLE, setVisibility );
+
 
 	this.animating = false;
 	this.duration = 1000;
@@ -121,10 +121,13 @@ THREEFAB.Viewport = function( parameters ) {
 	// =============================================================================
 	
 	this.render = function() {
-		_this.controls.update();
 
-		if(this.animating) {
-			this.processAnimation();
+    var delta = clock.getDelta();
+		
+    _this.controls.update();
+
+		if( _this.animating ) {
+      _this._SELECTED.updateAnimation( 1000 * delta );
 		}
 
 		//this.processParticles();
@@ -153,28 +156,29 @@ THREEFAB.Viewport = function( parameters ) {
 		_this.render();
 
 	};
-	
-	this.selected = function(object) {
-		
-		// Pause any animations taking place
-		pauseAnimation();
 
-		// Remove the current overdraw
-		if(_this._SELECTED && _this._SELECTED.material) {
-			_this._SELECTED.material.program = null;
-			_this._SELECTED.material.overdraw = false;
-		}
+  this.setupDefaultScene = function() {
+    var mesh = this.addPrimitive.call( this, null, 'cube' );
+    var lightmesh = this.addLight.call( this, null, 'point', false );
+    
+    this._SELECTED = mesh;
+
+    $.publish( THREEFAB.Events.VIEWPORT_MESH_SELECTED, [mesh] );
+  };
+	
+	this.selected = function( object ) {
 		
-		_this._SELECTED = object;
+    _this._SELECTED = object;
 		
-		if(!_this._SELECTED.light) {
-			// It's a mesh!
-			this.selectMesh(object);
+    // Pause any animations taking place
+		pauseAnimation();
+		
+		if ( !_this._SELECTED.light ) {
+      // It's a mesh!
+			this.selectMesh( object );
 		} else {
-			// It's a light!
-			$.publish(THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, object);
-			_this._SELECTED.material.program = null;
-			_this._SELECTED.material.overdraw = true;
+      // It's a light!
+			$.publish( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, [object] );
 		}
 
 		_this.updateManipulator();
@@ -231,13 +235,8 @@ THREEFAB.Viewport = function( parameters ) {
 		_this.manipulator.position.copy( _this._SELECTED.position );
 	};
 
-	this.selectMesh = function (object) {
-
-		if( meshCanAnimate() ) {
-			_this.animationMorphTarget = new THREEFAB.AnimationMorphTarget(object, _this.duration);
-		}
-
-		$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, object);
+	this.selectMesh = function ( object ) {
+		$.publish( THREEFAB.Events.VIEWPORT_MESH_SELECTED, [object] );
 	};
 
 	this.selectNextMesh = function() {
@@ -250,85 +249,82 @@ THREEFAB.Viewport = function( parameters ) {
 		}
 	};
 
-	function outlinerChanged(name) {
-		
-		var child = _this.scene.getChildByName(name);
-		_this.selected(child);
-	}
+	function outlinerChanged( event, name ) {
+
+		var child = _this.scene.getChildByName( name, true );
+    _this.selected( child );
+  }
+
+  function outlinerParentChanged( evt, event ) {
+
+    var move_info = event.move_info,
+        child,
+        target,
+        parent;
+    
+    child = _this.scene.getChildByName( move_info.moved_node.name, true );
+    parent = child.parent;
+
+    if ( move_info.position === 'inside' ) {
+      target = _this.scene.getChildByName( move_info.target_node.name, true );
+      THREE.SceneUtils.attach( child, _this.scene, target );
+    } else {
+      target = _this.scene;
+      THREE.SceneUtils.detach( child, target, _this.scene );
+      child.position.x -= target.position.x - parent.position.x;
+      child.position.y -= target.position.y - parent.position.y;
+      child.position.z -= target.position.z - parent.position.z;
+    }
+  }
+
+  function setVisibility( event, name, status ) {
+    var child = _this.scene.getChildByName( name, true );
+    child.visible = status;
+    THREE.SceneUtils.showHierarchy( child, status );
+  }
 
 	function targetCenter() {
 		_this.controls.target = new THREE.Vector3();
 	}
 
-	function updateMeshFrame(frame) {
-		if( meshCanAnimate() ) {
-			/*_this._SELECTED.morphTargetInfluences[ _this.keyframe ] = 0;
-			_this._SELECTED.morphTargetInfluences[ frame ] = 1;
-			_this.keyframe = frame;*/
-			if(!_this.animating) {
-				_this.animationMorphTarget.gotoFrame( frame );
-			}
-		}
-	}
-
 	function playAnimation() {
-		if( meshCanAnimate() ) {
-			_this.animationMorphTarget.play();
-			_this.animating = true;
-		}
+    if ( !_this.animating ) {
+      _this.animating = true;
+    } else {
+      _this.animating = false;
+    }
 	}
 
 	function pauseAnimation() {
-		if(_this.animationMorphTarget) {
-			_this.animationMorphTarget.pause();
-		}
 		_this.animating = false;
-	}
-
-	function changeAnimationDuration(value) {
-		_this.duration = value;
-
-		if(_this.animating) {
-			pauseAnimation();
-		}
-
-		if(_this.animationMorphTarget) {
-			_this.animationMorphTarget.clear();
-			_this.animationMorphTarget = new THREEFAB.AnimationMorphTarget(_this._SELECTED, _this.duration);
-		}
-
-		$.publish(THREEFAB.Events.TIMELINE_RESET);
-	}
-
-	function meshCanAnimate() {
-
-		if(_this._SELECTED.morphTargetInfluences) {
-			return true;
-		}
-
-		return false;
 	}
 
 	function deleteObject() {
 
-		if(_this._SELECTED) {
-				
-			if(_this._SELECTED.light) {
-				// If it's a light remove that too
-				_this.scene.remove(_this._SELECTED.light);
-			}
+		if ( _this._SELECTED ) {
 			
+      // Tell everyone we deleted an object
+      $.publish( THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, [_this._SELECTED] );
+
 			// Remove currently selected mesh
-			_this.scene.remove(_this._SELECTED);
+			_this.scene.remove( _this._SELECTED );
 
 			// Get the next object and select that one
 			_this.selectNextMesh();
-
-			// Tell everyone we deleted an object
-			$.publish(THREEFAB.Events.VIEWPORT_OBJECT_REMOVED, _this.scene);
 		}
 
 	}
+
+  function duplicateObject() {
+    if ( _this._SELECTED ) {
+      var clone = THREE.SceneUtils.cloneObject( _this._SELECTED );
+      clone.name += '.' + clone.id;
+      clone.position.set(0,0,0);
+      _this.scene.add( clone );
+
+      $.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, [clone] );
+    }
+  }
 	
 	// =============================================================================
 	//
@@ -349,22 +345,22 @@ THREEFAB.Viewport = function( parameters ) {
 		_projector.unprojectVector( vector, _this.camera );
 
 		var ray = new THREE.Ray( _this.camera.position, vector.subSelf( _this.camera.position ).normalize() );
-		var toIntersect = [];
+		// var toIntersect = [];
 
-    THREE.SceneUtils.traverseHierarchy( _this.scene, function( child ) {
+  //   THREE.SceneUtils.traverseHierarchy( _this.scene, function( child ) {
       
-      if (child instanceof THREE.Mesh && !(child.geometry instanceof THREE.PlaneGeometry)) {
-        toIntersect.push(child);
-      }
+  //     if (child instanceof THREE.Mesh && child.name !== "THREE.Grid.Plane" ) {
+  //       toIntersect.push(child);
+  //     }
 
-		});
-    var intersects = ray.intersectObjects( toIntersect );
-		
+		// });
+    var intersects = ray.intersectObjects( _this.scene.children, true );
+		console.log('RAY :: intersects ', intersects);
 		if ( intersects.length > 0 ) {
-      console.log(intersects);
+      
       var hit = intersects[0].object;
       var is_manipulator = hit.name === "x_manipulator" || hit.name === "y_manipulator" || hit.name === "z_manipulator";
-      console.log(hit.name);
+      
       while ( !(is_manipulator || hit.parent instanceof THREE.Scene) ) {
         hit = hit.parent;
       }
@@ -465,33 +461,44 @@ THREEFAB.Viewport = function( parameters ) {
 			code = e.which;
 		}
 		
-		if (code === 88) {
+		if ( code === 88 ) {
 
 			// X Key
-			$.publish(THREEFAB.Events.DELETE_PRESSED);
+			$.publish( THREEFAB.Events.DELETE_PRESSED );
 
-		} else if(code === 32) {
+		} else if ( code === 32 ) {
 
 			// Spacebar
-			$.publish(THREEFAB.Events.SPACEBAR_PRESSED);
+			$.publish( THREEFAB.Events.SPACEBAR_PRESSED );
 
-		}
+		} else if ( code === 68 ) { // D Key
+      if ( e.shiftKey ) {
+        //Shift+D was pressed, duplicate mesh;
+        $.publish( THREEFAB.Events.SHIFT_D_PRESSED );
+      }
+    }
 	});
+
+  // =============================================================================
+  // DEFAULT Light, Cube.  Like Blender.
+  // =============================================================================
+  
+  _this.setupDefaultScene();
 };
 
 THREEFAB.Viewport.prototype = {
 
-	addPrimitive: function(type) {
+	addPrimitive: function( event, type ) {
 		
 		var material,
 			geometry,
 			mesh,
 			meshName,
 			rotation,
-			doubleSided = false;
+			doubleSided = false,
+      whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
 		
-		
-		material = new THREE.MeshPhongMaterial( { wireframe: false, map: new THREEFAB.CanvasTexture(), shading: THREE.SmoothShading, overdraw: false } );
+		material = new THREE.MeshPhongMaterial( { wireframe: false, map: whiteMap, shading: THREE.SmoothShading, overdraw: false } );
 		material.name = 'MeshPhongMaterial';
 				
 		if(type === "sphere") {
@@ -521,50 +528,52 @@ THREEFAB.Viewport.prototype = {
 		mesh = new THREE.Mesh(geometry, material);
 		mesh.name = meshName + "." + mesh.id;
 
-		if(rotation) {
-			mesh.rotation.copy(rotation);
+		if( rotation ) {
+			mesh.rotation.copy( rotation );
 		}
-		if(doubleSided) {
+
+		if( doubleSided ) {
 			mesh.doubleSided = true;
 		}
 		
-		this.scene.add(mesh);
+		this.scene.add( mesh );
+    this.selected( mesh );
 
-		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
+		$.publish( THREEFAB.Events.VIEWPORT_OBJECT_ADDED, [mesh] );
 		
 		return mesh;
 	},
 	
-    importExternal: function() {
-    
-        var txt = 'Enter a 3D model URL:<br />' +
-            '<input type="text" id="importURL" ' +
-            'name="importURL" value="" />';
-            
-        var _scene = this.scene;
-        function importcallback(e, v, m, f) {
-            if (v === 'Import') {
-            
-                loader = new THREE.ColladaLoader();
-                loader.options.convertUpAxis = true;
-                collada = loader.load( f.importURL, function(collada) {
+  importExternal: function() {
+  
+      var txt = 'Enter a 3D model URL:<br />' +
+          '<input type="text" id="importURL" ' +
+          'name="importURL" value="" />';
+          
+      var _scene = this.scene;
+      function importcallback(e, v, m, f) {
+          if (v === 'Import') {
+          
+              loader = new THREE.ColladaLoader();
+              loader.options.convertUpAxis = true;
+              collada = loader.load( f.importURL, function(collada) {
 
-                    mesh = THREEFAB.PrepareCollada(collada);
-                    mesh.importURL = f.importURL;
-                    _scene.add(mesh);
-                
-                    $.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, _scene);
-            
-                });
-            }
-        }
+                  mesh = THREEFAB.PrepareCollada(collada);
+                  mesh.importURL = f.importURL;
+                  _scene.add(mesh);
+              
+                  $.publish( THREEFAB.Events.VIEWPORT_OBJECT_ADDED, [mesh] );
+          
+              });
+          }
+      }
 
-        $.prompt(txt, {
-            callback: importcallback,
-            buttons: { Import: 'Import', Cancel: 'Cancel' }
-        });
-        
-    },
+      $.prompt(txt, {
+          callback: importcallback,
+          buttons: { Import: 'Import', Cancel: 'Cancel' }
+      });
+      
+  },
 	
 	addParticleSystem: function() {
 		// create the particle variables
@@ -594,7 +603,7 @@ THREEFAB.Viewport.prototype = {
 		}
 		
 		// create the particle system
-		this.particleSystem = new THREE.ParticleSystem( particles, pMaterial);
+		this.particleSystem = new THREE.ParticleSystem( particles, pMaterial );
 		this.particleGeometry = particles;
 		
 		this.particleSystem.sortParticles = true;
@@ -603,24 +612,28 @@ THREEFAB.Viewport.prototype = {
 		this.scene.add(this.particleSystem);
 	},
 	
-	addModel: function(mesh) {
-		this.scene.add(mesh);
-		this.selected(mesh);
-		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
+	addModel: function( event, mesh ) {
+		
+    this.scene.add( mesh );
+		this.selected( mesh );
+
+		$.publish( THREEFAB.Events.VIEWPORT_OBJECT_ADDED, [mesh] );
 
 		return mesh;
 	},
 	
-	addLight: function(type) {
+	addLight: function( event, type, selected ) {
 		
 		var lightmesh;
 		
+    selected = selected !== undefined ? selected : true;
+    
 		if(type === "point") {
-			lightmesh = new THREEFAB.PointLightContainer(this.scene);
+			lightmesh = new THREEFAB.PointLightContainer( this.scene );
 		} else if(type === "spot") {
-			lightmesh = new THREEFAB.SpotLightContainer(this.scene);
+			lightmesh = new THREEFAB.SpotLightContainer( this.scene );
 		} else if(type === "ambient") {
-			lightmesh = new THREEFAB.AmbientLightContainer(this.scene);
+			lightmesh = new THREEFAB.AmbientLightContainer( this.scene );
 		}
 		
 		lightmesh.mesh.position.y = 150;
@@ -628,12 +641,16 @@ THREEFAB.Viewport.prototype = {
 		
 		this.resetMaterials();
 
-		$.publish(THREEFAB.Events.VIEWPORT_OBJECT_ADDED, this.scene);
+		$.publish( THREEFAB.Events.VIEWPORT_OBJECT_ADDED, [lightmesh.mesh] );
 		
+    if ( selected ) {
+      this.selected( lightmesh.mesh );
+    }
+
 		return lightmesh;
 	},
 	
-	addTexture: function(tex) {
+	addTexture: function( event, tex ) {
 
 		if ( !this._SELECTED.light ) {
 
@@ -646,13 +663,13 @@ THREEFAB.Viewport.prototype = {
 
       } else {
         
-        this._SELECTED.material.program = null;
+        //this._SELECTED.material.program = null;
         this._SELECTED.material.map = tex;
 
       }
 			
 
-			$.publish(THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, this._SELECTED);
+			$.publish( THREEFAB.Events.VIEWPORT_OBJECT_TEXTURE_ADDED, [this._SELECTED] );
 		}
 	},
 
@@ -661,12 +678,12 @@ THREEFAB.Viewport.prototype = {
     if ( this._SELECTED.name.search('OBJLoader') !== -1  ) {
 
       for ( var i = 0, l = this._SELECTED.children.length; i < l; i ++ ) {
-        this._SELECTED.children[ i ].program = null;
+        //this._SELECTED.children[ i ].program = null;
         this._SELECTED.children[ i ].map = new THREEFAB.CanvasTexture();
       }
       
     } else {
-      this._SELECTED.material.program = null;
+      //this._SELECTED.material.program = null;
       this._SELECTED.material.map = new THREEFAB.CanvasTexture();
     }
 		
@@ -679,21 +696,13 @@ THREEFAB.Viewport.prototype = {
 			var child = this.scene.children[i], cached_mat;
 			if(child.material && child instanceof THREE.Mesh) {
 				cached_mat = child.material;
-				child.material.program = false;
-				child.material = null;
+				//child.material.program = false;
+				//child.material = null;
 				child.material = cached_mat;
 			}
 		}
 		
-	},
-	
-	setupDefaultScene: function() {
-		var mesh = this.addPrimitive.call(this, 'cube');
-		var lightmesh = this.addLight.call(this, 'point');
-		
-		this._SELECTED = mesh;
-
-		$.publish(THREEFAB.Events.VIEWPORT_MESH_SELECTED, mesh);
 	}
+
 };
 	

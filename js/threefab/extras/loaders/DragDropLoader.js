@@ -75,78 +75,94 @@ THREEFAB.DragDropLoader = function() {
 			if(extension === 'js') {
 				
 				// We dropping in a mesh.
-				json = JSON.parse(contents);
+				json = JSON.parse( contents );
 	
-				loader = new THREE.JSONLoader();
+				loader = new THREE.JSONLoader( true );
 				loader.createModel( json, function ( geometry ) {
 
 					// This is a valid model.
 					var material;
+          var whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
 
 					// Make sure this model has UV coordinates.
-					if(json.uvs[0].length > 0) {
-						material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: new THREEFAB.CanvasTexture() } );
+					if ( json.uvs[0].length > 0 ) {
+						material = new THREE.MeshPhongMaterial( { color: 0xffffff, wireframe: false, map: whiteMap } );
 					} else {
 						material = new THREE.MeshPhongMaterial();
 					}
+
 					material.name = 'MeshPhongMaterial';
 
-					// Check for morphing targets and add to material.
-					if(geometry.morphTargets.length > 0) {
-						material.morphTargets = true;
-					}
-
-					if(geometry.skinWeights.length > 0) {
+					if ( geometry.skinWeights.length > 0 ) {
 						
+            material.morphTargets = true;
+
 						// Check for skinned mesh
 						mesh = new THREE.SkinnedMesh( geometry, material );
 						mesh.name = 'THREE.SkinnedMesh.' + mesh.id;
 					
-					} else {
+					} else if ( geometry.morphTargets.length > 0 )  {
+            geometry.computeMorphNormals();
+
+            material.morphTargets = true;
+            material.morphNormals = true;
+            material.perPixel = true;
+            
+            mesh = new THREE.MorphAnimMesh( geometry, material );
+            mesh.parseAnimations();
+
+            if ( _.isEmpty( mesh.geometry.animations ) ) {
+              mesh.geometry.animations = {
+                base: {
+                  start: 0,
+                  end: mesh.geometry.morphTargets.length - 1
+                }
+              };
+            }
+
+            mesh.name = 'THREE.MorphAnimMesh.' + mesh.id;
+          } else {
 
 						// Regular mesh.
 						mesh = new THREE.Mesh( geometry, material );
-						mesh.name = 'THREE.JSONLoader.' + mesh.id;
+						mesh.name = 'THREE.Mesh.' + mesh.id;
 					}
 					
-					if(json.scale) {
+					if ( json.scale ) {
 						mesh.scale.x = mesh.scale.y = mesh.scale.z = json.scale;
 					}
-
-					$.publish(THREEFAB.Events.MODEL_LOADED, mesh);
-
+          console.log( mesh );
+					$.publish( THREEFAB.Events.MODEL_LOADED, [mesh] );
 				});
-			} else if(extension === 'dae') {
+			} else if ( extension === 'dae' ) {
 
         loader = new THREE.ColladaLoader();
         loader.options.convertUpAxis = true;
         collada = loader.parse( $.parseXML( contents ) );
 
-        mesh = THREEFAB.PrepareCollada(collada);
+        mesh = THREEFAB.PrepareCollada( collada );
 
-        $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
+        $.publish( THREEFAB.Events.MODEL_LOADED, [mesh] );
 
-      } else if(extension === 'obj') {
+      } else if ( extension === 'obj' ) {
 
         loader = new THREE.OBJLoader();
         mesh = loader.parse( contents );
         mesh.name = 'THREE.OBJLoader.' + mesh.id;
 
-        $.publish(THREEFAB.Events.MODEL_LOADED, mesh);
+        $.publish( THREEFAB.Events.MODEL_LOADED, [mesh] );
 
-			} else if(isImage) {
+			} else if ( isImage ) {
 
 				// We are dropping in a texture.
-				
 				var img = new Image();
 				img.src = contents;
 				
-				var texture = new THREE.Texture(img);
+				var texture = new THREE.Texture( img );
 				texture.needsUpdate = true;
 				
 				img.onload = function() {
-          console.log(texture);
-					$.publish(THREEFAB.Events.TEXTURE_LOADED, texture);
+					$.publish( THREEFAB.Events.TEXTURE_LOADED, [texture] );
 				};
 			}
 			

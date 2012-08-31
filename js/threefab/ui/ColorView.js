@@ -37,10 +37,10 @@ THREEFAB.ColorView = Backbone.View.extend({
 		this.el.append( this.types.ambient );
 		this.el.append( this.types.specular );
 
-		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.meshChanged);
+		$.subscribe( THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.meshChanged );
 	},
 
-	meshChanged: function( object ) {
+	meshChanged: function( event, object ) {
 		if(object.material && object.material.ambient) {
 			var color = { r: object.material.color.r*255, g:object.material.color.g*255, b:object.material.color.b*255 },
 				ambient = { r: object.material.ambient.r*255, g:object.material.ambient.g*255, b:object.material.ambient.b*255 },

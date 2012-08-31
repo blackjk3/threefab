@@ -331,6 +331,10 @@ td {
 /* ==|== primary styles =====================================================
    Author: 
    ========================================================================== */
+select {
+  background-color: white;
+  border: 1px solid #BBB;
+}
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial;
   margin: 0px;
@@ -483,6 +487,11 @@ body {
   margin: 0 -1px;
   height: 27px;
 }
+.small-button {
+  padding: 0 0.3em 0 0.3em;
+  height: 19px;
+  line-height: 19px;
+}
 .center {
   margin: 3px;
   height: 23px;
@@ -519,23 +528,70 @@ body {
 .code-container pre {
   font-size: 12px;
 }
+#tree {
+  padding: 10px 0 0 2px;
+  width: 243px;
+  height: 150px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: #1A1A1A;
+}
+#tree ul {
+  margin: 0 0 0 2px;
+}
+#tree li {
+  margin-bottom: 0px;
+}
+#new-hierarchy-button {
+  margin-right: 5px;
+}
+.heirarchy-icon {
+  opacity: 1;
+  font-size: 1.2em;
+  color: #fff;
+  margin-right: 4px;
+}
+.icon-locked {
+  opacity: 0.5;
+}
 #bottom-toolbar {
   background: #444444;
   width: 100%;
-  height: 40px;
+  height: 60px;
   padding-left: 5px;
   position: fixed;
   bottom: 0;
   z-index: 2;
+  font-size: 13px;
   color: #fff;
+}
+#bottom-toolbar .anim-controls {
+  line-height: 20px;
+  width: 400px;
+}
+#bottom-toolbar .anim-controls .icon-anim {
+  float: left;
+  margin: 3px 3px 0 0;
+  font-size: 20px;
+  font-weight: normal;
+}
+#bottom-toolbar .anim-controls .anim-label {
+  margin-top: 5px;
+}
+#bottom-toolbar .anim-controls .anim-toolbox {
+  margin-top: 2px;
+}
+#bottom-toolbar .anim-controls .anim-toolbox #sel-animation {
+  margin: 2px 5px 0 0;
 }
 #bottom-toolbar .time-buttons {
   float: left;
 }
 #bottom-toolbar .button {
-  margin: 3px 5px 3px 0;
-  padding: 2px;
-  height: 35px;
+  margin: 3px 3px 3px 0;
+  padding: 2px 3px 2px 5px;
+  height: 13px;
+  line-height: 13px;
 }
 #bottom-toolbar .button span {
   display: block;
@@ -556,18 +612,20 @@ body {
   background-position: -90px 0;
 }
 #bottom-toolbar .timeline-container {
-  float: left;
-  margin: 3px 0;
+  margin: 13px 0;
   padding: 0;
   background: #666;
   width: 400px;
-  height: 30px;
+  height: 25px;
+  border-radius: 3px;
+  border: 1px solid #333;
 }
 #bottom-toolbar img {
   vertical-align: top;
   margin: 7px 0;
 }
 #bottom-toolbar canvas {
+  border-radius: 3px;
   cursor: pointer;
 }
 #bottom-toolbar .menu {
@@ -620,9 +678,9 @@ body {
   padding-right: 10px;
 }
 input#duration {
-  margin: 3px 3px 0 5px;
-  padding: 5px;
-  height: 23px;
+  margin: 3px 3px 0 0;
+  padding: 5px 3px 3px 3px;
+  height: 10px;
   width: 25px;
   background: #333;
   color: #fff;

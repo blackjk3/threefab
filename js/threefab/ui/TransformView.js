@@ -44,7 +44,7 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.el.append( this.gui.domElement );
 		
 		// Add Camera
-		this.folders.camera = this.gui.addFolder('Camera')	;
+		this.folders.camera = this.gui.addFolder('Camera');
 		this.addCameraOptions();
 
 		// Add target
@@ -54,12 +54,8 @@ THREEFAB.TransformView = Backbone.View.extend({
 		this.folders.viewport.open();
 
 		// Add outliner
-		this.folders.outliner = this.gui.addFolder('Outliner');
 		this.outliner = new THREEFAB.OutlinerView();
-		this.outliner.render( this.viewport.scene );
-
-		this.folders.outliner.__ul.appendChild(this.outliner.el[0]);
-		this.folders.outliner.open();
+		this.outliner.render( null, this.viewport.scene );
 						
 		// Add transforms
 		this.folders.transforms = this.gui.addFolder('Transforms');

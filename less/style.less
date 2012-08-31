@@ -211,6 +211,11 @@ td { vertical-align: top; }
    Author: 
    ========================================================================== */
 
+select {
+  background-color: white;
+  border: 1px solid #BBB;
+}
+
 body {
 	font-family: 'Helvetica Neue', Helvetica, Arial;
 	margin: 0px;
@@ -386,6 +391,12 @@ body {
 	height: 27px;
 }
 
+.small-button {
+  padding: 0 0.3em 0 0.3em;
+  height: 19px;
+  line-height: 19px;
+}
+
 .center {
 	margin: 3px;
 	height:23px;
@@ -429,16 +440,71 @@ body {
 	}
 }
 
+ #tree {
+  padding: 10px 0 0 2px;
+  width: 243px;
+  height: 150px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: #1A1A1A;
+  ul {
+    margin: 0 0 0 2px;
+  }
+  li {
+    margin-bottom: 0px;
+  }
+ }
+
+ #new-hierarchy-button {
+  margin-right: 5px;
+ }
+
+ .heirarchy-icon {
+  opacity: 1;
+  font-size: 1.2em;
+  color: #fff;
+  margin-right: 4px;
+ }
+
+ .icon-locked {
+  opacity: 0.5;
+ }
 
 #bottom-toolbar {
-	background:#444444;
-	width:100%;
-	height:40px;
-	padding-left:5px;
+	background: #444444;
+	width: 100%;
+	height: 60px;
+	padding-left: 5px;
 	
-	position:fixed;
-	bottom:0;
-	z-index:2;
+	position: fixed;
+	bottom: 0;
+	z-index: 2;
+  font-size: 13px;
+
+  .anim-controls {
+    
+    line-height: 20px;
+    width: 400px;
+
+    .icon-anim {
+      float: left;
+      margin: 3px 3px 0 0;
+      font-size: 20px;
+      font-weight: normal;
+    }
+
+    .anim-label {
+      margin-top: 5px;
+    }
+
+    .anim-toolbox {
+      margin-top: 2px;
+
+      #sel-animation {
+        margin: 2px 5px 0 0;
+      }
+    }
+  }
 
 	.time-buttons {
 		float:left;
@@ -447,9 +513,10 @@ body {
 	color:#fff;
 
 	.button {
-		margin:3px 5px 3px 0;
-		padding:2px;	
-		height:35px;
+		margin:3px 3px 3px 0;
+		padding: 2px 3px 2px 5px;
+		height: 13px;
+    line-height: 13px;
 
 		span {
 			display:block;
@@ -476,12 +543,13 @@ body {
 	}
 
 	.timeline-container {
-		float:left;
-		margin:3px 0;
-		padding:0;
-		background:#666;
-		width:400px;
-		height:30px;
+		margin: 13px 0;
+		padding: 0;
+		background: #666;
+		width: 400px;
+		height: 25px;
+    border-radius: 3px;
+    border: 1px solid #333;
 	}
 
 	img {
@@ -490,6 +558,7 @@ body {
 	}
 
 	canvas {
+    border-radius: 3px;
 		cursor:pointer;
 	}
 
@@ -552,9 +621,9 @@ body {
 }
 
 input#duration {
-	margin:3px 3px 0 5px;
-	padding:5px;
-	height:23px;
+	margin:3px 3px 0 0;
+	padding: 5px 3px 3px 3px;
+	height: 10px;
 	width:25px;
 
 	background:#333;

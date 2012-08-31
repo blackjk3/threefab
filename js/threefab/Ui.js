@@ -7,7 +7,7 @@
  *
  */
  
-THREEFAB.Ui = function(viewport) {
+THREEFAB.Ui = function( viewport ) {
 	
 	var _viewport = viewport,
 		materialModel = new THREEFAB.MaterialModel();
@@ -27,11 +27,13 @@ THREEFAB.Ui = function(viewport) {
 		var target = e.target || e.srcElement,
 			id = target.id;
 
-		if(id === 'menu-animate') {
-			$.publish(THREEFAB.Events.SPACEBAR_PRESSED);
-		} else if(id === 'menu-delete') {
-			$.publish(THREEFAB.Events.DELETE_PRESSED);
-		}
+		if ( id === 'menu-animate' ) {
+			$.publish( THREEFAB.Events.SPACEBAR_PRESSED );
+		} else if ( id === 'menu-delete' ) {
+			$.publish( THREEFAB.Events.DELETE_PRESSED );
+		} else if ( id === 'menu-duplicate' ) {
+      $.publish( THREEFAB.Events.SHIFT_D_PRESSED );
+    }
 	}
 };
 

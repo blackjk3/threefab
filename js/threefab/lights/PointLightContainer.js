@@ -27,10 +27,8 @@ THREEFAB.PointLightContainer = function ( scene, hex, intensity, distance ) {
 	light.rotation = mesh.rotation;
 	
 	mesh.light = light;
-	
+	mesh.add(light);
+
+  this.mesh = mesh;
 	scene.add(mesh);
-	scene.add(light);
-	
-	
-	this.mesh = mesh;
 };

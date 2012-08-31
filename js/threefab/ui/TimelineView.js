@@ -6,7 +6,6 @@
  *
  */
 
-
 THREEFAB.TimelineView = Backbone.View.extend({
 		
 	el: '#bottom-toolbar',
@@ -16,47 +15,57 @@ THREEFAB.TimelineView = Backbone.View.extend({
 	canvas: document.createElement("canvas"),
 	c: {},
 
-	headerHeight:35,
-	headerWidth:400,
+	headerHeight: 25,
+	headerWidth: 400,
 	
-	frames:20,
-	currentFrame:0,
+	frames: 20,
+	currentFrame: 0,
 	
 	isPlaying: false,
 
 	playButton: {},
 
+  animations: null,
+  activeAnimation: null,
+  mesh: null,
+  animationFPS: 6,
+
 	initialize: function() {
 
-		_.bindAll(this);
-		this.el = $(this.el);
+		_.bindAll( this );
+		this.el = $( this.el );
 
-		this.container = this.el.find(this.container);
-		this.duration = this.el.find(this.duration);
+		this.container = this.el.find( this.container );
+		this.duration = this.el.find( this.duration );
 		
-		this.duration.bind('keyup', this.durationChanged);
-		this.duration.bind('keypress', this.numericOnly);
+		this.duration.bind( 'keyup', this.durationChanged );
+		this.duration.bind( 'keypress', this.numericOnly );
 
 		this.canvas.width = this.headerWidth;
 		this.canvas.height = this.headerHeight;
-		this.c = this.canvas.getContext("2d");
+		this.c = this.canvas.getContext( "2d" );
 
-		this.canvas.addEventListener('mousedown', this.mouseDown, false);
-		document.body.addEventListener('mouseup', this.mouseUp, false);
+		this.canvas.addEventListener( 'mousedown', this.mouseDown, false );
+		document.body.addEventListener( 'mouseup', this.mouseUp, false );
 
-		this.el.find('.back').bind('click', this.back);
-		this.el.find('.forward').bind('click', this.forward);
+		this.el.find( '.back' ).bind( 'click', this.back );
+		this.el.find( '.forward' ).bind( 'click', this.forward );
 		
-		this.playButton = this.el.find('#playButton');
-		this.playButton.bind('click', this.play);
+    this.animations = this.el.find( '#sel-animation');
+    this.animations.on( 'change', this.changeAnimation );
 
-		$.subscribe(THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.objectChanged);
-		$.subscribe(THREEFAB.Events.VIEWPORT_KEYFRAME_CHANGED, this.keyframeChanged);
-		$.subscribe(THREEFAB.Events.SPACEBAR_PRESSED, this.play);
-		$.subscribe(THREEFAB.Events.TIMELINE_RESET, this.reset);
+		this.playButton = this.el.find( '#playButton' );
+		this.playButton.bind( 'click', this.play );
+
+		$.subscribe( THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.objectChanged );
+    $.subscribe( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.objectChanged );
+    
+		//$.subscribe(THREEFAB.Events.VIEWPORT_KEYFRAME_CHANGED, this.keyframeChanged);
+		//$.subscribe(THREEFAB.Events.SPACEBAR_PRESSED, this.play);
+		//$.subscribe(THREEFAB.Events.TIMELINE_RESET, this.reset);
 	},
 	
-	render: function(frames) {
+	render: function( frames ) {
 		this.container.append(this.canvas);
 
 		if(frames) {
@@ -65,6 +74,48 @@ THREEFAB.TimelineView = Backbone.View.extend({
 
 		this.build(0, this.frames);
 	},
+
+  loadAnimations: function( mesh ) {
+    
+    if ( mesh.geometry ) {
+      if ( !_.isEmpty( mesh.geometry.animations )  ) {
+        var output = [];
+        
+        _.each( mesh.geometry.animations, function( animation, key ) {
+          output.push('<option value="'+ key +'">'+ key +'</option>');
+        });
+        
+        this.animations.html( output.join('') );
+        this.mesh = mesh;
+
+        return;
+      }
+    }
+
+    // There are no animations for this mesh.
+    this.mesh = null;
+    this.animations.empty();
+  },
+
+  changeAnimation: function() {
+    if ( this.mesh ) {
+      this.setAnimation( this.animations.val() );
+    }
+  },
+
+  setAnimation: function ( animationName ) {
+
+    if ( this.mesh ) {
+      this.mesh.playAnimation( animationName, this.animationFPS );
+      this.mesh.baseDuration = this.mesh.duration;
+    }
+
+    this.activeAnimation = animationName;
+  },
+
+  update: function ( delta ) {
+    this.mesh.updateAnimation( 1000 * delta );
+  },
 
 	build: function(goto, frames, broadcast) {
 		var size = Math.floor(this.canvas.width/frames),
@@ -103,21 +154,22 @@ THREEFAB.TimelineView = Backbone.View.extend({
 		this.keyframeChanged(0);
 	},
 
-	objectChanged: function(object) {
+	objectChanged: function( event, object ) {
+    console.log('changed object', object);
+    this.loadAnimations( object );
+		// this.isPlaying = false;
+		// this.playButton.addClass('play');
+		// this.playButton.removeClass('pause');
 
-		this.isPlaying = false;
-		this.playButton.addClass('play');
-		this.playButton.removeClass('pause');
-
-		if(object.morphTargetInfluences) {
-			if(object.morphTargetInfluences.length > 0) {
-				this.frames = object.morphTargetInfluences.length;
-				this.build(0, this.frames, false);
-			}
-		} else {
-			this.build(0,20, false);
-			this.frames = 20;
-		}
+		// if(object.morphTargetInfluences) {
+		// 	if(object.morphTargetInfluences.length > 0) {
+		// 		this.frames = object.morphTargetInfluences.length;
+		// 		this.build(0, this.frames, false);
+		// 	}
+		// } else {
+		// 	this.build(0,20, false);
+		// 	this.frames = 20;
+		// }
 	},
 
 	keyframeChanged: function(goto) {
@@ -128,11 +180,14 @@ THREEFAB.TimelineView = Backbone.View.extend({
 
 		var value = this.duration.val();
 
-		if( $.isNumeric(value) ) {
-			$.publish(THREEFAB.Events.TIMELINE_DURATION_CHANGED, value*1000);
-		} else {
-			this.duration.val("1");
+		if( !$.isNumeric(value) ) {
+      this.duration.val("1");
+      return;
 		}
+
+    if ( this.mesh ) {
+      this.mesh.duration = value * 1000;
+    }
 	},
 
 	numericOnly: function(e) {
@@ -174,21 +229,26 @@ THREEFAB.TimelineView = Backbone.View.extend({
 	},
 	
 	play: function() {
-		if(this.isPlaying) {
-			
-			// Pause
-			$.publish(THREEFAB.Events.TIMELINE_PAUSE);
-			this.pause();
-		
-		} else {
 
-			// Play
-			$.publish(THREEFAB.Events.TIMELINE_PLAY);
-			this.isPlaying = true;
+    if ( this.mesh ) {
+      $.publish(THREEFAB.Events.TIMELINE_PLAY);
+    }
+    
+		// if(this.isPlaying) {
 			
-			this.playButton.addClass('pause');
-			this.playButton.removeClass('play');
-		}
+		// 	// Pause
+		// 	$.publish(THREEFAB.Events.TIMELINE_PAUSE);
+		// 	this.pause();
+		
+		// } else {
+
+		// 	// Play
+		// 	$.publish(THREEFAB.Events.TIMELINE_PLAY);
+		// 	this.isPlaying = true;
+			
+		// 	this.playButton.addClass('pause');
+		// 	this.playButton.removeClass('play');
+		// }
 	},
 
 	pause: function() {

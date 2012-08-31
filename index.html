@@ -26,6 +26,8 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/colorpicker.css">
   <link rel="stylesheet" href="css/impromptu.css">
+  <link rel="stylesheet" href="css/jqtree.css">
+  <link rel="stylesheet" href="css/icons.css">
   
   <!-- end CSS-->
 
@@ -58,13 +60,18 @@
     		<li><a href="#torus" class="torus" title="Torus"></a></li>
     	</ul>
     	<ul class="export-list">
-        <li><button class="import button">Import</button>
-        <li><button class="export button">Export</button>
+        <li><button class="import button"><span class="icon-download">&nbsp;Import</button>
+        <li><button class="export button"><span class="icon-upload-2">&nbsp;Export</button>
       </ul>
       
   </div>
   </div>
-  <div id="gui-transform-container"></div>
+  <div id="gui-transform-container">
+    <div class="hierarchy-container">
+      <div class="title"><span class="icon-tree-view"> Hierarchy</div>
+      <div id="tree"></div>
+    </div>
+  </div>
   <div id="gui-materials-container">
   	<div></div>
   </div>
@@ -74,24 +81,36 @@
   </div>
 
   <div id="bottom-toolbar" class="clearfix">
-    
-    <div class="time-buttons">
-      <button class="back button"><span></span></button><button id="playButton" class="play button"><span></span></button><button class="forward button"><span></span></button>
+    <div class="fl anim-controls">
+      <span class="icon-clock icon-anim"></span> 
+      <div class="fl anim-label">Animation</div>
+      <div class="fr anim-toolbox">
+        <select id="sel-animation" name="sel-animation" class="fl"></select>
+        <div class="fl button icon-wrench" title="Edit Animations"></div>
+        <div id="playButton" class="fl button icon-arrow-right-6" title="Play/Pause"></div>
+        <input type="text" id="duration" name="duration" value="1" maxlength="5">&nbsp;sec
+        
+      </div>
     </div>
-    <div class="timeline-container"></div>
-    <input type="text" id="duration" name="duration" value="1" maxlength="5">&nbsp;sec
+    <!-- <div class="time-buttons">
+      <button class="back button"><span></span></button><button id="playButton" class="play button"><span></span></button><button class="forward button"><span></span></button>
+    </div> --><br>
+    <div class="timeline-container hidden"></div>
+    
 
     <div class="menu clearfix">
       <ul>
         <li>Object
           <ul>
             <li id="menu-animate" class="clearfix">Animate <span>Space</span></li>
+            <li id="menu-duplicate" class="clearfix">Duplicate <span>Shift-D</span></li>
             <li id="menu-delete" class="clearfix">Delete <span>X</span></li>
           </ul>
         </li>
       </ul>
     </div>
   </div>
+
   <!-- JavaScript at the bottom for fast page loading -->
 
   <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -103,7 +122,8 @@
   <script src="js/libs/backbone.js"></script>
 
   <script src="js/mylibs/dat.gui.js"></script>
-  <script src="js/mylibs/Three.js"></script>
+  <script src="js/mylibs/three.js"></script>
+  <script src="js/mylibs/cannon.js"></script>
 
   <script src="js/threefab/controls/ViewportControls.js"></script>
   <script src="js/threefab/objects/ManipulatorTool.js"></script>
@@ -111,8 +131,6 @@
   
   <script src="js/threefab/ThreeFab.js"></script>
   <script src="js/threefab/Events.js"></script>
-
-  <script src="js/threefab/textures/CanvasTexture.js"></script>
   
   <script src="js/threefab/extras/loaders/OBJLoader.js"></script>
   <script src="js/threefab/extras/loaders/DragDropLoader.js"></script>
