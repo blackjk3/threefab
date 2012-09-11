@@ -150,3 +150,7 @@ ul.jqtree-tree .jqtree-moving > div .jqtree-title {
   cursor: pointer;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+.hierarchy-container .closed {
+  background-image: url(data:image/gif;base64,R0lGODlhBQAFAJEAAP////Pz8////////yH5BAEAAAIALAAAAAAFAAUAAAIIlGIWqMCbWAEAOw==);
+}

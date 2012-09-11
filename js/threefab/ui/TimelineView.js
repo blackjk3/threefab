@@ -12,6 +12,8 @@ THREEFAB.TimelineView = Backbone.View.extend({
 	duration: '#duration',
 	container: '.timeline-container',
 
+  editTemplate: null,
+
 	canvas: document.createElement("canvas"),
 	c: {},
 
@@ -35,11 +37,13 @@ THREEFAB.TimelineView = Backbone.View.extend({
 		_.bindAll( this );
 		this.el = $( this.el );
 
+    this.editTemplate = _.template( $('#template-edit-animations').html() );
+
 		this.container = this.el.find( this.container );
 		this.duration = this.el.find( this.duration );
 		
-		this.duration.bind( 'keyup', this.durationChanged );
-		this.duration.bind( 'keypress', this.numericOnly );
+		this.duration.on( 'keyup', this.durationChanged );
+		this.duration.on( 'keypress', this.numericOnly );
 
 		this.canvas.width = this.headerWidth;
 		this.canvas.height = this.headerHeight;
@@ -48,14 +52,17 @@ THREEFAB.TimelineView = Backbone.View.extend({
 		this.canvas.addEventListener( 'mousedown', this.mouseDown, false );
 		document.body.addEventListener( 'mouseup', this.mouseUp, false );
 
-		this.el.find( '.back' ).bind( 'click', this.back );
-		this.el.find( '.forward' ).bind( 'click', this.forward );
+		this.el.find( '.back' ).on( 'click', this.back );
+		this.el.find( '.forward' ).on( 'click', this.forward );
 		
     this.animations = this.el.find( '#sel-animation');
     this.animations.on( 'change', this.changeAnimation );
 
 		this.playButton = this.el.find( '#playButton' );
-		this.playButton.bind( 'click', this.play );
+		this.playButton.on( 'click', this.play );
+
+    this.editAnimation = this.el.find( '#edit-animation' );
+    this.editAnimation.on( 'click', this.editAnimations );
 
 		$.subscribe( THREEFAB.Events.VIEWPORT_MESH_SELECTED, this.objectChanged );
     $.subscribe( THREEFAB.Events.VIEWPORT_LIGHT_SELECTED, this.objectChanged );
@@ -95,6 +102,31 @@ THREEFAB.TimelineView = Backbone.View.extend({
     // There are no animations for this mesh.
     this.mesh = null;
     this.animations.empty();
+  },
+
+  editAnimations: function() {
+    if ( this.mesh ) {
+
+      $.prompt( this.editTemplate({ animations: this.mesh.geometry.animations }) , {
+        callback: this.saveAnimations,
+        buttons: { Save: 'Save', Cancel: 'Cancel' }
+      });
+    } else {
+      alert( 'A mesh with animations must be selected first.' );
+    }
+  },
+
+  saveAnimations: function( e, buttonName, ele, obj ) {
+    var _self = this;
+    
+    if ( buttonName === 'Save') {
+      _.each( this.mesh.geometry.animations, function( animation, key ) {
+        animation.start = parseInt( obj[key + '_start'], 10 );
+        animation.end = parseInt( obj[key + '_end'], 10 );
+      });
+
+      this.setAnimation( this.activeAnimation );
+    }
   },
 
   changeAnimation: function() {
@@ -155,7 +187,7 @@ THREEFAB.TimelineView = Backbone.View.extend({
 	},
 
 	objectChanged: function( event, object ) {
-    console.log('changed object', object);
+    
     this.loadAnimations( object );
 		// this.isPlaying = false;
 		// this.playButton.addClass('play');
@@ -232,6 +264,8 @@ THREEFAB.TimelineView = Backbone.View.extend({
 
     if ( this.mesh ) {
       $.publish(THREEFAB.Events.TIMELINE_PLAY);
+    } else {
+      alert( 'A mesh with animations must be selected first.' );
     }
     
 		// if(this.isPlaying) {
@@ -251,12 +285,12 @@ THREEFAB.TimelineView = Backbone.View.extend({
 		// }
 	},
 
-	pause: function() {
-		this.isPlaying = false;
+	// pause: function() {
+	// 	this.isPlaying = false;
 
-		this.playButton.addClass('play');
-		this.playButton.removeClass('pause');
-	},
+	// 	this.playButton.addClass('play');
+	// 	this.playButton.removeClass('pause');
+	// },
 	
 	forward: function() {
 		this.build(this.frames-1, this.frames, true);

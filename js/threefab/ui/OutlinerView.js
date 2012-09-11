@@ -12,6 +12,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 	el: $('<li class="list-hierarchy"></li>'),
   data: [],
   $tree: null,
+  $title: null,
 
 	initialize: function() {
 
@@ -38,11 +39,25 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 
     this.$tree.on( 'tree.move', this.movedNode );
     this.$tree.on( 'tree.click', this.clickedNode );
+    
+    this.$title = $('.hierarchy-container .title');
+    this.$title.on( 'click', this.toggleVisibility );
 	},
 
 	render: function( event, scene ) {
 		this.resetOptions( scene.children );
 	},
+
+  toggleVisibility: function() {
+   
+    this.$tree.toggle();
+   
+    if ( this.$title.hasClass('closed') ) {
+      this.$title.removeClass('closed');
+    } else {
+      this.$title.addClass('closed');
+    }
+  },
 
 	change: function() {
 
@@ -50,7 +65,7 @@ THREEFAB.OutlinerView = Backbone.View.extend({
 	},
 
   clickedNode: function( event ) {
-    console.log();
+    
     var target = event.capturedTarget,
         klass = target[0].className;
         node = event.node;

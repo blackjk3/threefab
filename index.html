@@ -86,7 +86,7 @@
       <div class="fl anim-label">Animation</div>
       <div class="fr anim-toolbox">
         <select id="sel-animation" name="sel-animation" class="fl"></select>
-        <div class="fl button icon-wrench" title="Edit Animations"></div>
+        <div id="edit-animation" class="fl button icon-wrench" title="Edit Animations"></div>
         <div id="playButton" class="fl button icon-arrow-right-6" title="Play/Pause"></div>
         <input type="text" id="duration" name="duration" value="1" maxlength="5">&nbsp;sec
         
@@ -123,7 +123,6 @@
 
   <script src="js/mylibs/dat.gui.js"></script>
   <script src="js/mylibs/three.js"></script>
-  <script src="js/mylibs/cannon.js"></script>
 
   <script src="js/threefab/controls/ViewportControls.js"></script>
   <script src="js/threefab/objects/ManipulatorTool.js"></script>
@@ -166,5 +165,25 @@
     <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
   <![endif]-->
 
+  <script type="x-templ" id="template-edit-animations">
+    <div id="edit-animations">
+      <table width="100%">
+        <thead>
+          <th>Animation</th>
+          <th width="50">Start</th>
+          <th width="50">End</th>
+        </thead>
+        <tbody>
+        <% _.each( animations, function( animation, key ) { %>
+          <tr>
+            <td><%= key %></td>
+            <td><input type="text" id="<%= key %>_start" name="<%= key %>_start" value="<%= animation.start %>" size="3"></td>
+            <td><input type="text" id="<%= key %>_end" name="<%= key %>_end" value="<%= animation.end %>" size="3"></td>
+          </tr>
+        <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </script>
 </body>
 </html>

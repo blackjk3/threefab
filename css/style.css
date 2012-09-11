@@ -677,6 +677,14 @@ body {
   float: right;
   padding-right: 10px;
 }
+#edit-animations {
+  height: 350px;
+  overflow-y: scroll;
+}
+#edit-animations th {
+  background: #F4F4F4;
+  padding: 3px;
+}
 input#duration {
   margin: 3px 3px 0 0;
   padding: 5px 3px 3px 3px;

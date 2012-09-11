@@ -20,6 +20,7 @@ THREEFAB.SpotLightContainer = function ( scene, hex, intensity, distance ) {
 	
 	
 	var light = new THREE.SpotLight(hex, intensity, distance, true);
+  light.shadowCameraVisible = true;
 	light.name = 'THREE.SpotLight';
 	
 	// Link light position and rotation to the fake holder object.

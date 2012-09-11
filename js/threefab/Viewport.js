@@ -345,17 +345,9 @@ THREEFAB.Viewport = function( parameters ) {
 		_projector.unprojectVector( vector, _this.camera );
 
 		var ray = new THREE.Ray( _this.camera.position, vector.subSelf( _this.camera.position ).normalize() );
-		// var toIntersect = [];
-
-  //   THREE.SceneUtils.traverseHierarchy( _this.scene, function( child ) {
-      
-  //     if (child instanceof THREE.Mesh && child.name !== "THREE.Grid.Plane" ) {
-  //       toIntersect.push(child);
-  //     }
-
-		// });
     var intersects = ray.intersectObjects( _this.scene.children, true );
-		console.log('RAY :: intersects ', intersects);
+    
+		//console.log('RAY :: intersects ', intersects);
 		if ( intersects.length > 0 ) {
       
       var hit = intersects[0].object;
