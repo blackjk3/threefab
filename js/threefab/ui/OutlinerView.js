@@ -98,11 +98,11 @@ THREEFAB.OutlinerView = Backbone.View.extend({
     if ( target.css('opacity') === '0.5' ) {
       
       target.css({ opacity: '1' });
-      return true;
+      return false;
     }
 
     target.css({ opacity: '0.5' });
-    return false;
+    return true;
   },
 
   movedNode: function( event ) {
